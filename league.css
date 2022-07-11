@@ -18,14 +18,54 @@ body {
     width: 200px;
     font-size: 20px;
 }
+
+#inputs-div {
+    width: max-content;
+    margin: auto;
+}
+#inputs-div br {
+    clear: both;
+}
+
 .init-team-div {
     margin: 5px;
+    margin-left: 40px;
+
     font: normal 20px 'Verdana';
     width: 300px;
     text-align: center;
+    float: left;
 }
 .init-team-div::placeholder {
     color: #b6b6b6;
+}
+.check-div {
+    width: 26px;
+    height: 26px;
+
+    float: left;
+    margin: 7px;
+
+    border-radius: 50%;
+    outline: solid gray 2px;
+
+    font: bold 20px 'Verdana';
+    line-height: 26px;
+    color: gray;
+    visibility: hidden;
+}
+
+#init-properties-div {
+    display: none;
+}
+#colors-div input {
+    margin-bottom: 4px;
+}
+#colors-div div {
+    width: 30px;
+    height: 30px;
+    float: left;
+    outline: solid black 1px;
 }
 
 /* TEAMS TABLE */
@@ -156,18 +196,4 @@ button {
     width: 160px;
     padding: 1px;
     font: normal 20px 'Verdana';
-}
-
-/* Init Page */
-#init-properties-div {
-    display: none;
-}
-#colors-div input {
-    margin-bottom: 4px;
-}
-#colors-div div {
-    width: 30px;
-    height: 30px;
-    float: left;
-    outline: solid black 1px;
 }

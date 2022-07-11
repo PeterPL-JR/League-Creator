@@ -16,6 +16,14 @@ if (isset($_POST['get'])) {
         }
     }
     echo json_encode($teams)."";
+} else if(isset($_POST['check'])) {
+
+    $content = $_POST['check'];
+    $query = mysqli_query($base, "SELECT COUNT(*) FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = '$content';");
+    
+    $amount = mysqli_fetch_row($query)[0];
+    echo $amount;
+
 } else {
 ?>
 
@@ -39,13 +47,14 @@ if (isset($_POST['get'])) {
         <div id="colors-div">
             <div></div><input type="number" value="0" id="green"><br>
             <div></div><input type="number" value="0" id="yellow"><br>
-            <div></div><input type="number" value="0" id="whitea"><br>
             <div></div><input type="number" value="0" id="red"><br>
+            <div></div><input type="number" value="0" id="whitea"><br>
         </div><br>
 
         <div style="font-size: 23px;">Ilość Kolejek (1-2)</div>
         <input type="number" id="rounds-amount" min=1 max=2 value="2"><br>
     </div><br><br>
+    <div id="inputs-div"></div>
 </div>
 
 <div id="game-div">

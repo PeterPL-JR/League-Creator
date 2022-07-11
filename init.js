@@ -5,8 +5,8 @@ var teamsAmount;
 
 const COLOR_GREEN = "#ccffcc";
 const COLOR_YELLOW = "#ffffcc";
-const COLOR_WHITE = "#fffffe";
 const COLOR_RED = "#ffcccc";
+const COLOR_WHITE = "#fefefe";
 
 var green, yellow, white, red;
 var matchesPerRound;
@@ -36,20 +36,38 @@ function initPage() {
     colorsDivs[0].style.backgroundColor = COLOR_GREEN;
     colorsDivs[1].style.backgroundColor = COLOR_YELLOW;
 
-    colorsDivs[2].style.backgroundColor = COLOR_WHITE;
-    colorsDivs[3].style.backgroundColor = COLOR_RED;
-
+    colorsDivs[2].style.backgroundColor = COLOR_RED;
+    colorsDivs[3].style.backgroundColor = COLOR_WHITE;
+    
     saveButton.onclick = clickAmountButton;
 }
 
+function checkTeam(index) {
+    var value = document.getElementsByClassName("init-team-div")[index].value;
+    var checkDiv = document.getElementsByClassName("check-div")[index];
+
+    serverPost("league.php", {check: value}, function(text) {
+        var result = parseInt(text);
+        checkDiv.style.visibility = (result == 1) ? "visible" : "hidden";
+    });
+}
+
 function initTeamsInputs() {
+    var inputsDiv = getId("inputs-div");
+
     for (var i = 0; i < teamsAmount; i++) {
         var input = document.createElement("input");
         input.className = "init-team-div";
         input.placeholder = "Drużyna " + (i + 1);
+
+        input.setAttribute("onkeyup", `checkTeam(${i});`);
+        inputsDiv.appendChild(input);
         
-        initDiv.appendChild(input);
-        initDiv.appendChild(document.createElement("br"));
+        var div = document.createElement("div");
+        div.className = "check-div";
+        div.innerHTML = "&#x2714";
+        inputsDiv.appendChild(div);
+        inputsDiv.appendChild(document.createElement("br"));
     }
 }
 
@@ -57,6 +75,7 @@ function clickAmountButton() {
     var amountInput = getId("teams-amount");
     teamsAmount = parseInt(amountInput.value);
 
+    getId("whitea").value = teamsAmount;
     saveButton.onclick = function () { }
 
     if (teamsAmount >= 4 && teamsAmount <= 10) {
