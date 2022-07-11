@@ -1,0 +1,173 @@
+body {
+    text-align: center;
+}
+:root {
+    --height: 30px;
+}
+
+#game-div {
+    display: none;
+}
+
+/* INIT DIV */
+#teams-amount {
+    width: 240px;
+    font-size: 30px;
+}
+#rounds-amount {
+    width: 200px;
+    font-size: 20px;
+}
+.init-team-div {
+    margin: 5px;
+    font: normal 20px 'Verdana';
+    width: 300px;
+    text-align: center;
+}
+.init-team-div::placeholder {
+    color: #b6b6b6;
+}
+
+/* TEAMS TABLE */
+#teams-table img {
+    width: 50px;
+    float: left;
+    margin-top: 8px;
+    margin: 5px;
+}
+#teams-table div {
+    margin-right: 10px;
+    margin-top: 4px;
+    float: left;
+
+    font: normal 20px 'Verdana';
+    height: var(--height);
+    line-height: var(--height);
+}
+
+#teams-table {
+    border-collapse: collapse;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#teams-table, tr, td, th {
+    border: solid black 1px;
+}
+
+#teams-table td:nth-child(1) {
+    font-size: 30px;
+}
+
+#teams-table tr {
+    height: var(--height);
+    text-align: center;
+}
+
+#teams-table td:not(:nth-child(1), :nth-child(2)) {
+    padding: 10px;
+    font: normal 20px 'Verdana';
+
+}
+#teams-table td:nth-child(3) {
+    font: bold 24px 'Verdana';
+}
+
+#teams-table tr:nth-child(1) {
+    background-color: #e0e0e0;
+}
+#teams-table th {
+    font: bold 20px 'Caladea';
+
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* MATCHES TABLE */
+#matches-table {
+    border-collapse: collapse;
+    margin: auto;
+}
+
+#matches-table td {
+    padding: 2px;
+}
+
+#matches-table img {
+    width: 50px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+#matches-table span {
+    font: normal 22px 'Verdana';
+    height: var(--height);
+    line-height: var(--height);
+}
+#matches-table b {
+    margin: 10px;
+    font-size: 35px;
+}
+
+input::-webkit-inner-spin-button, input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+input[type="number"] {
+    width: 20px;
+    padding: 3px;
+    font: normal 23px 'Verdana';
+    text-align: center;
+}
+input:disabled {
+    background-color: white;
+    border: solid #383838 1px;
+    border-radius: 3px;
+}
+
+#matches-table td:first-child {
+    text-align: left;
+    width: 360px;
+}
+#matches-table td:last-child {
+    text-align: right;
+    width: 360px;
+}
+#matches-table td:nth-child(2) {
+    width: 120px;
+    text-align: center;
+}
+
+button {
+    margin: 20px;
+    font: normal 26px 'Verdana';
+    padding: 3px;
+    width: 180px;
+    cursor: pointer;
+}
+
+#round {
+    font: normal 30px 'Verdana';
+    margin-bottom: 5px;
+}
+
+#green, #yellow, #red, #whitea {
+    width: 160px;
+    padding: 1px;
+    font: normal 20px 'Verdana';
+}
+
+/* Init Page */
+#init-properties-div {
+    display: none;
+}
+#colors-div input {
+    margin-bottom: 4px;
+}
+#colors-div div {
+    width: 30px;
+    height: 30px;
+    float: left;
+    outline: solid black 1px;
+}
