@@ -52,7 +52,7 @@ if (isset($_POST['get'])) {
         </div><br>
 
         <div style="font-size: 23px;">Ilość Kolejek (1-2)</div>
-        <input type="number" id="rounds-amount" min=1 max=2 value="2"><br>
+        <input type="number" id="rounds-amount" min=1 max=2 value="1"><br>
     </div><br><br>
     <div id="inputs-div"></div>
 </div>

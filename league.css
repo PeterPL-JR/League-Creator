@@ -197,3 +197,8 @@ button {
     padding: 1px;
     font: normal 20px 'Verdana';
 }
+
+/* STATISTICS */
+.places-table td {
+    font: normal 25px 'Verdana' !important;
+}

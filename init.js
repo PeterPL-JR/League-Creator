@@ -3,6 +3,8 @@ var matches = [];
 var roundsAmount;
 var teamsAmount;
 
+var placesAfterRounds = [];
+
 const COLOR_GREEN = "#ccffcc";
 const COLOR_YELLOW = "#ffffcc";
 const COLOR_RED = "#ffcccc";
@@ -55,10 +57,14 @@ function checkTeam(index) {
 function initTeamsInputs() {
     var inputsDiv = getId("inputs-div");
 
+    var predefined = ["Polska", "Holandia", "Czechy", "Turcja"];
+
     for (var i = 0; i < teamsAmount; i++) {
         var input = document.createElement("input");
         input.className = "init-team-div";
         input.placeholder = "Drużyna " + (i + 1);
+
+        input.value = predefined[i];
 
         input.setAttribute("onkeyup", `checkTeam(${i});`);
         inputsDiv.appendChild(input);
