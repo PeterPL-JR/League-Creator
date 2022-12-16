@@ -1,0 +1,101 @@
+body {
+    overflow-y: scroll;
+    user-select: none;
+}
+body *:not(input)::selection {
+    background-color: #0000;
+}
+
+#pots {
+    margin: 40px;
+}
+#teams {
+    max-width: 1170px;
+    width: max-content;
+    height: 300px;
+    
+    margin: auto;
+    margin-top: 40px;
+    text-align: left;
+}
+h2 {
+    margin: 2px;
+}
+
+
+.teams-table {
+    width: 220px;
+    margin-left: 20px;
+    margin-right: 20px;
+    display: inline-block;
+
+    border: none;
+}
+.teams-table tr:first-child {
+    font-size: 25px;
+}
+.teams-table tr:last-child {
+    border-bottom: solid black 1px;
+}
+.teams-table tr {
+    display: block;
+    border-bottom: none;
+}
+
+#input-div {
+    width: max-content;
+    display: inline-block;
+}
+
+#teams-input {
+    width: 300px;
+    padding: 2px;
+    font-size: 20px;
+}
+#teams-amount {
+    display: inline;
+    margin: 10px;
+}
+
+.team-elem {
+    position: relative;
+    display: inline-block;
+    width: 280px;
+    height: 60px;
+
+    font-size: 25px;
+    line-height: 60px;
+
+    border: solid gray 1px;
+    margin: 5px;
+    background-color: #f9f9f9;
+    cursor: default;
+}
+.team-elem img {
+    position: absolute;
+    left: 5px;
+    height: 70%;
+
+    top: 0px;
+    bottom: 0px;
+
+    margin: auto;
+}
+.team-elem div {
+    position: absolute;
+    left: 76px;
+}
+.flying-elem {
+    position: absolute;
+    z-index: 3;
+    visibility: visible !important;
+}
+
+.team-selected {
+    background-color: #dfdede !important;
+    cursor: pointer;
+}
+.pot-selected {
+    background-color: #cbcbcb !important;
+    font-weight: bold;
+}

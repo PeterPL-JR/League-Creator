@@ -69,13 +69,13 @@ body {
 }
 
 /* TEAMS TABLE */
-#teams-table img {
+.teams-table img {
     width: 50px;
     float: left;
     margin-top: 8px;
     margin: 5px;
 }
-#teams-table div {
+.teams-table div {
     margin-right: 10px;
     margin-top: 4px;
     float: left;
@@ -85,39 +85,38 @@ body {
     line-height: var(--height);
 }
 
-#teams-table {
+.teams-table {
     border-collapse: collapse;
     margin: auto;
     margin-top: 20px;
     margin-bottom: 20px;
 }
 
-#teams-table, tr, td, th {
+.teams-table, tr, td, th {
     border: solid black 1px;
 }
 
-#teams-table td:nth-child(1) {
+.teams-table td:nth-child(1) {
     font-size: 30px;
 }
 
-#teams-table tr {
+.teams-table tr {
     height: var(--height);
     text-align: center;
 }
 
-#teams-table td:not(:nth-child(1), :nth-child(2)) {
+.teams-table td:not(:nth-child(1), :nth-child(2)) {
     padding: 10px;
     font: normal 20px 'Verdana';
-
 }
-#teams-table td:nth-child(3) {
+.teams-table td:nth-child(3) {
     font: bold 24px 'Verdana';
 }
 
-#teams-table tr:nth-child(1) {
+.teams-table tr:nth-child(1) {
     background-color: #e0e0e0;
 }
-#teams-table th {
+.teams-table th {
     font: bold 20px 'Caladea';
 
     padding-left: 10px;

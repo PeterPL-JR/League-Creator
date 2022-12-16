@@ -1,5 +1,3 @@
-const LEAGUE_PHP_FILE = "league.php";
-
 let teams = [];
 var matches = [];
 var roundsAmount;
@@ -115,7 +113,8 @@ function clickStartButton() {
         array.push(inputs[i].value);
     }
 
-    serverPost(LEAGUE_PHP_FILE, { get: JSON.stringify(array) }, function (text) {
+    const arrayString = JSON.stringify(array);
+    serverPost(LEAGUE_PHP_FILE, { get: arrayString }, function (text) {
         var allTeams = JSON.parse(text);
 
         green = getId("green").value;

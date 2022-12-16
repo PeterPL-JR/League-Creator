@@ -3,9 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>League Qualification</title>
+    <link rel="stylesheet" href="league.css" type="text/css">
+    <link rel="stylesheet" href="qualification.css" type="text/css">
+
+    <script src="library.js"></script>
+    <script src="variables.js"></script>
 </head>
 <body>
-<?php
-?>
+    <div id="pots"></div>
+    <div id="container">
+        <div id="input-div">
+            <h2>Drużyny</h2>
+            <input type="text" id="teams-input">
+        </div>
+        <div id="teams-amount">(55)</div>
+        <div id="teams"></div>
+    </div>
+    <script src="qualification.js"></script>
 </body>
 </html>

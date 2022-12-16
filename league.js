@@ -16,8 +16,6 @@ class Match {
     }
 }
 
-const FLAGS_SRC = "../create-mundial/flags/";
-
 function createMatches(teamsAmount, double) {
     var matchesArray = [];
     var numbers = [];
@@ -86,7 +84,7 @@ function init() {
 
 function initTeamsTable(teamsTable) {
     var table = document.createElement("table");
-    table.id = "teams-table";
+    table.className = "teams-table";
 
     var thr = document.createElement("tr");
     thr.innerHTML = `<th>M</th><th>Drużyna</th><th>Pkt</th><th>+</th><th>-</th><th>+/-</th><th>W</th><th>R</th><th>P</th>`;
