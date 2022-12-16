@@ -92,7 +92,7 @@ function initTeamsTable(teamsTable) {
 
     for (var t = 0; t < teamsTable.length; t++) {
         var tr = document.createElement("tr");
-        tr.innerHTML = `<td>${t + 1}</td><td><img src="flags/${teamsTable[t].link}"><div>${teamsTable[t].name}</div></td>`;
+        tr.innerHTML = `<td>${t + 1}</td><td><img src="../create-mundial/flags/${teamsTable[t].link}"><div>${teamsTable[t].name}</div></td>`;
 
         for (var key in teamsTable[t].stats) {
             var stat = teamsTable[t].stats[key];
@@ -140,7 +140,7 @@ function createMatch(table, matchObj) {
 
     tr.innerHTML =
     `<td>
-        <img src='flags/${team1.link}'>
+        <img src='../create-mundial/flags/${team1.link}'>
         <span>${team1.name}</span>
     </td>
     <td>
@@ -148,7 +148,7 @@ function createMatch(table, matchObj) {
     </td>
     <td>
         <span>${team2.name}</span>
-        <img src='flags/${team2.link}'>
+        <img src='../create-mundial/flags/${team2.link}'>
     </td>`;
 
     table.appendChild(tr);
@@ -349,7 +349,7 @@ function setTableTeams(teamsTable) {
 
     for (var i = 0; i < trs.length; i++) {
         var tds = trs[i].querySelectorAll("td");
-        tds[1].innerHTML = `<img src="flags/${teamsTable[i].link}"><div>${teamsTable[i].name}</div>`;
+        tds[1].innerHTML = `<img src="../create-mundial/flags/${teamsTable[i].link}"><div>${teamsTable[i].name}</div>`;
 
         var stats = [];
         for (var key in teamsTable[i].stats) {
@@ -393,7 +393,7 @@ function roundsTable() {
 
     for (var t = 0; t < teams.length; t++) {
         var tr = document.createElement("tr");
-        tr.innerHTML = `<td><img src="flags/${finalTeams[t].link}"><div>${finalTeams[t].name}</div></td>`;
+        tr.innerHTML = `<td><img src="../create-mundial/flags/${finalTeams[t].link}"><div>${finalTeams[t].name}</div></td>`;
 
         var teamId = finalTeams[t].id;
         for(var r = 0; r < placesAfterRounds.length; r++) {

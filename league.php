@@ -39,8 +39,8 @@ if (isset($_POST['get'])) {
 <body>
 
 <div id="init-div">
-    <div style="font-size: 23px;">Ilość drużyn (4-10)</div>
-    <input type="number" id="teams-amount" min=4 max=10 value="4"><br>
+    <div style="font-size: 23px;">Ilość drużyn</div>
+    <input type="number" id="teams-amount"value="4"><br>
     <button id="save-amount">Zapisz</button><br>
     
     <div id="init-properties-div">

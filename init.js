@@ -64,7 +64,7 @@ function initTeamsInputs() {
         input.className = "init-team-div";
         input.placeholder = "Drużyna " + (i + 1);
 
-        input.value = predefined[i];
+        // input.value = predefined[i];
 
         input.setAttribute("onkeyup", `checkTeam(${i});`);
         inputsDiv.appendChild(input);
