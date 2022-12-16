@@ -1,3 +1,5 @@
+const LEAGUE_PHP_FILE = "league.php";
+
 let teams = [];
 var matches = [];
 var roundsAmount;
@@ -48,7 +50,7 @@ function checkTeam(index) {
     var value = document.getElementsByClassName("init-team-div")[index].value;
     var checkDiv = document.getElementsByClassName("check-div")[index];
 
-    serverPost("league.php", {check: value}, function(text) {
+    serverPost(LEAGUE_PHP_FILE, {check: value}, function(text) {
         var result = parseInt(text);
         checkDiv.style.visibility = (result == 1) ? "visible" : "hidden";
     });
@@ -113,7 +115,7 @@ function clickStartButton() {
         array.push(inputs[i].value);
     }
 
-    serverPost("league.php", { get: JSON.stringify(array) }, function (text) {
+    serverPost(LEAGUE_PHP_FILE, { get: JSON.stringify(array) }, function (text) {
         var allTeams = JSON.parse(text);
 
         green = getId("green").value;

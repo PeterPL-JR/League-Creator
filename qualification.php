@@ -6,9 +6,6 @@
 </head>
 <body>
 <?php
-
-include 'get.php';
-
 ?>
 </body>
 </html>
