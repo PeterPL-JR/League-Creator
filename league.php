@@ -59,9 +59,10 @@ if (isset($_POST['get'])) {
 <head>
     <meta charset="UTF-8">
     <title>League Creator</title>
-    <script src="library.js"></script>
-    <script src="variables.js"></script>
-    <script src="matches.js"></script>
+    <script src="scripts/library.js"></script>
+    <script src="scripts/matches.js"></script>
+    <script src="scripts/functions.js"></script>
+    <script src="scripts/variables.js"></script>
     <link rel="stylesheet" href="league.css" type="text/css">
 </head>
 <body onload="initMenuPage();">

@@ -80,8 +80,8 @@ function initMatchesTable() {
 function createMatch(table, matchObj) {
     let tr = document.createElement("tr");
 
-    let team1 = findTeam(matchObj.team1);
-    let team2 = findTeam(matchObj.team2);
+    let team1 = findTeam(teams, matchObj.team1);
+    let team2 = findTeam(teams, matchObj.team2);
 
     tr.innerHTML =
     `<td>
@@ -97,14 +97,6 @@ function createMatch(table, matchObj) {
     </td>`;
 
     table.appendChild(tr);
-}
-
-function findTeam(id) {
-    for (let team of teams) {
-        if (team.id == id) {
-            return team;
-        }
-    }
 }
 
 function setColors(colors) {
@@ -151,7 +143,7 @@ function playMatch(input1, input2) {
 
     let matchObject = matches[round * matchesPerRound + match];
     matchObject.playMatch(score1, score2);
-    scoreMatchTeam(score1, score2, findTeam(matchObject.team1), findTeam(matchObject.team2));
+    scoreMatchTeam(score1, score2, findTeam(teams, matchObject.team1), findTeam(teams, matchObject.team2));
 
     let sorted = sortTeams(teams);
     setTableTeams(sorted);
@@ -174,117 +166,6 @@ function playMatch(input1, input2) {
     }
     startMatch();
     return true;
-}
-
-function sortTeams(teams) {
-    let table = [];
-    for (let team of teams) {
-        table.push(team);
-    }
-
-    table.sort(function (x, y) {
-        return y.stats.points - x.stats.points;
-    });
-
-    let pointGroups = [];
-    let maxPoints = totalRounds * POINTS_FOR_VICTORY + 1;
-
-    for (let i = 0; i < maxPoints; i++) {
-
-        let theSame = [];
-        for (let team of table) {
-            if (team.stats.points == i) {
-                theSame.push(team);
-            }
-        }
-
-        theSame.sort(function (x, y) {
-            let xGoals = x.stats.goalsScored - x.stats.goalsLost;
-            let yGoals = y.stats.goalsScored - y.stats.goalsLost;
-
-            return yGoals - xGoals;
-        });
-
-        if (theSame.length >= 1) {
-            theSame.sort(function (x, y) {
-                return y.stats.goals - x.stats.goals;
-            });
-            pointGroups.push(checkGoalsScored(theSame));
-        }
-    }
-
-    let newTeams = [];
-    for (let i = pointGroups.length - 1; i >= 0; i--) {
-        for (let team of pointGroups[i]) {
-            newTeams.push(team);
-        }
-    }
-    return newTeams;
-}
-
-function checkGoalsScored(teamsArray) {
-    if (teamsArray.length == 1) return teamsArray;
-
-    let goals = [];
-    for (let team of teamsArray) {
-        if (goals.indexOf(team.stats.goals) != -1) continue;
-        goals.push(team.stats.goals);
-    }
-
-    let newTeams = [];
-    for (let i = 0; i < goals.length; i++) {
-
-        let theSame = [];
-        for (let team of teamsArray) {
-            if (team.stats.goals == goals[i]) {
-                theSame.push(team);
-            }
-        }
-        if (theSame.length == 1) {
-            newTeams.push(theSame[0]);
-        } else {
-            theSame.sort(function (x, y) {
-                return y.stats.goalsScored - x.stats.goalsScored;
-            });
-            for (let theSameTeam of theSame) {
-                newTeams.push(theSameTeam);
-            }
-        }
-    }
-    return newTeams;
-}
-
-function scoreMatchTeam(score1, score2, team1, team2) {
-
-    team1.stats.goalsScored += score1;
-    team1.stats.goalsLost += score2;
-
-    team2.stats.goalsScored += score2;
-    team2.stats.goalsLost += score1;
-
-    team1.stats.goals = team1.stats.goalsScored - team1.stats.goalsLost;
-    team2.stats.goals = team2.stats.goalsScored - team2.stats.goalsLost;
-
-    if (score1 > score2) {
-
-        team1.stats.points += POINTS_FOR_VICTORY;
-        team1.stats.wins++;
-        team2.stats.losses++;
-
-    } else if (score1 < score2) {
-
-        team2.stats.points += POINTS_FOR_VICTORY;
-        team2.stats.wins++;
-        team1.stats.losses++;
-
-    } else if (score1 == score2) {
-
-        team1.stats.points += POINTS_FOR_DRAW;
-        team2.stats.points += POINTS_FOR_DRAW;
-
-        team1.stats.draws++;
-        team2.stats.draws++;
-    }
 }
 
 function setTableTeams(teamsTable) {

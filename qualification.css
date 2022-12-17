@@ -6,13 +6,19 @@ body *:not(input)::selection {
     background-color: #0000;
 }
 
+#container {
+    margin-top: 40px;
+}
 #pots {
-    margin: 40px;
+    margin: auto;
+    margin-top: 40px;
+
+    width: max-content;
+    height: max-content;
 }
 #teams {
-    max-width: 1170px;
     width: max-content;
-    height: 300px;
+    /* width: 1200px; */
     
     margin: auto;
     margin-top: 40px;
@@ -22,14 +28,27 @@ h2 {
     margin: 2px;
 }
 
-
 .teams-table {
     width: 220px;
     margin-left: 20px;
     margin-right: 20px;
-    display: inline-block;
 
+    float: left;
     border: none;
+}
+.teams-table img {
+    position: absolute;
+    height: 20px;
+    left: 5px;
+
+    top: 0px;
+    bottom: 0px;
+    margin: auto;
+}
+.teams-table div {
+    position: absolute;
+    margin: 0px;
+    left: 40px;
 }
 .teams-table tr:first-child {
     font-size: 25px;
@@ -40,6 +59,7 @@ h2 {
 .teams-table tr {
     display: block;
     border-bottom: none;
+    position: relative;
 }
 
 #input-div {
@@ -54,15 +74,18 @@ h2 {
 }
 div#teams-amount {
     display: inline;
-    margin: 10px;
+    position: absolute;
     font-size: 30px;
+
+    margin-top: -4px;
+    margin-left: 8px;
 }
 
 .team-elem {
     position: relative;
-    display: inline-block;
     width: 280px;
     height: 60px;
+    float: left;
 
     font-size: 25px;
     line-height: 60px;

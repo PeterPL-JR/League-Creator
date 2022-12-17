@@ -2,6 +2,9 @@ const _POTS = 6;
 let allPots = [];
 let allTeams = [];
 
+let potsTeams = [];
+let potsLengths = [];
+
 const potsDiv = getId("pots");
 const teamsInput = getId("teams-input");
 const teamsDiv = getId("teams");
@@ -14,9 +17,17 @@ let scrollBegin = null;
 let mouseX = null;
 let mouseY = null;
 
+const imagesObjs = {};
+
 function get() {
     serverPost(LEAGUE_PHP_FILE, {confed: "UEFA"}, function(text) {
         allTeams = JSON.parse(text);
+        for(let team of allTeams) {
+            const img = document.createElement("img");
+            img.src = FLAGS_SRC + team.link;
+            img.setAttribute("draggable", "false");
+            imagesObjs[team.id] = img;
+        }
         init();
     });
 }
@@ -24,11 +35,9 @@ get();
 
 function init() {
     createTables(allTeams.length);
-    teamsInput.onkeyup = findTeam;
+    teamsInput.onkeyup = createTeamsElements;
 
     document.body.onmousedown = function(event) {
-        const RIGHT_BUTTON = 2;
-
         if(event.button == RIGHT_BUTTON) {
             stopMoving();
         }
@@ -40,15 +49,22 @@ function init() {
     document.body.onscroll = function() {
         teamMove();
     }
-    findTeam();
+    potsDiv.oncontextmenu = function() {
+        return false;
+    }
+    createTeamsElements();
 }
 
 function createTables(teamsAmount) {
     const TEAMS_IN_POT = parseInt(teamsAmount / _POTS);
 
     for(let i = 0; i < _POTS; i++) {
+        potsTeams[i] = [];
+        potsLengths[i] = TEAMS_IN_POT;
+
         const table = document.createElement("table");
         table.className = "teams-table";
+        table.setAttribute("onmousedown", `choosePot(${i})`);
         table.setAttribute("onmouseenter", `mouseInPot(${i})`);
         table.setAttribute("onmouseleave", `mouseOutPot(${i})`);
 
@@ -63,17 +79,31 @@ function createTables(teamsAmount) {
         allPots.push(table);
         potsDiv.appendChild(table);
     }
+    createClearBoth(potsDiv);
 }
 
-function findTeam() {
+function createTeamsElements() {
     const inputText = teamsInput.value;
+    const MAX_IN_ROW = 3;
 
     serverPost(LEAGUE_PHP_FILE, {find: inputText}, function(text) {
         const teams = JSON.parse(text);
         teamsDiv.innerHTML="";
 
+        const usedTeams = concatArray(potsTeams);
+        let teamsCounter = 0;
+
         for(let team of teams) {
-            createTeamDiv(team);
+            const index = usedTeams.findIndex(function(elem) {
+                return elem == team.id;
+            });
+            if(index == -1) {
+                createTeamDiv(team);
+                teamsCounter++;
+            }
+            if(teamsCounter % MAX_IN_ROW == 0) {
+                createClearBoth(teamsDiv);
+            }
         }
     });
 }
@@ -83,7 +113,8 @@ function createTeamDiv(team) {
     const id = team.id;
 
     div.className = "team-elem";
-    div.innerHTML = `<img src='${FLAGS_SRC}${team.link}' draggable="false"><div>${team.name}</div>`;
+    div.innerHTML = `<div>${team.name}</div>`;
+    div.prepend(imagesObjs[team.id]);
     div.id = `team-div-${id}`;
 
     div.setAttribute("onmousedown", `updateTeam('${id}')`);
@@ -165,4 +196,49 @@ function mouseInPot(potIndex) {
 }
 function mouseOutPot(potIndex) {
     allPots[potIndex].querySelector("tr:first-child").className="";
+}
+
+function choosePot(index) {
+    if(draggedTeam != null && window.event.button == LEFT_BUTTON) {   
+        const pot = potsTeams[index]; 
+        if(pot.length < potsLengths[index]) {
+
+            potsTeams[index].push(draggedTeam);
+            updatePot(index);
+            
+            createTeamsElements();
+            stopMoving();
+        }
+    }
+}
+
+function updatePot(index) {
+    const pot = potsTeams[index];
+    const rows = allPots[index].querySelectorAll("tr:not(:first-child)");
+
+    for(let i = 0; i < rows.length; i++) {
+        rows[i].innerHTML="";
+    }
+
+    for(let i = 0; i < pot.length; i++) {
+        const team = findTeam(allTeams, pot[i]);
+
+        const div = document.createElement("div");
+        div.innerHTML = team.name;
+
+        rows[i].appendChild(div);
+        rows[i].appendChild(imagesObjs[team.id]);
+        rows[i].setAttribute("onmousedown", `removePotTeam(${index}, ${i})`);
+    }
+}
+function removePotTeam(potIndex, teamIndex) {
+    if(draggedTeam == null && window.event.button == RIGHT_BUTTON) {
+        const pot = potsTeams[potIndex];
+        const index = pot.findIndex(function(elem) {
+            return elem == pot[teamIndex];
+        });
+        pot.splice(index, 1);
+        updatePot(potIndex);
+        createTeamsElements();
+    }
 }

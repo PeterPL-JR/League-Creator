@@ -52,6 +52,12 @@ function createScript(src) {
     document.body.appendChild(script);
 }
 
+function createClearBoth(container) {
+    const div = document.createElement("div");
+    div.style.setProperty("clear", "both");
+    container.appendChild(div);
+}
+
 function getRandom(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -118,4 +124,18 @@ function isStringEmpty(string) {
         }
     }
     return true;
+}
+
+function concatArray(basicArray) {
+    let array = [];
+    if(basicArray.length == 0) return [];
+
+    for(let elem of basicArray) {
+        if(Array.isArray(elem)) {
+            array = array.concat(concatArray(elem));
+        } else {
+            array.push(elem);
+        }
+    }
+    return array;
 }
