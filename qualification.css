@@ -52,9 +52,10 @@ h2 {
     padding: 2px;
     font-size: 20px;
 }
-#teams-amount {
+div#teams-amount {
     display: inline;
     margin: 10px;
+    font-size: 30px;
 }
 
 .team-elem {

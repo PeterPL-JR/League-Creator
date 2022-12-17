@@ -1,66 +1,16 @@
-class Match {
-    constructor(teamObj1, teamObj2) {
-        var teamName1 = teamObj1.id;
-        var teamName2 = teamObj2.id;
-
-        this.team1 = teamName1;
-        this.team2 = teamName2;
-
-        this.score1 = -1;
-        this.score2 = -1;
-    }
-
-    playMatch(score1, score2) {
-        this.score1 = score1;
-        this.score2 = score2;
-    }
-}
-
-function createMatches(teamsAmount, double) {
-    var matchesArray = [];
-    var numbers = [];
-    for (var i = 1; i <= teamsAmount; i++) numbers.push(i);
-
-    if (teamsAmount % 2 == 1) {
-        numbers.push(-1);
-        teamsAmount += 1;
-    }
-    for (let j = 0; j < teamsAmount - 1; j += 1) {
-        matchesArray[j] = [];
-        for (let i = 0; i < teamsAmount / 2; i += 1) {
-            var second = teamsAmount - 1 - i;
-            if (numbers[i] != -1 && numbers[second] != -1) {
-                var host = i == 0 && j % 2 == 1;
-
-                var number1 = host ? numbers[second] : numbers[i];
-                var number2 = host ? numbers[i] : numbers[second];
-
-                matchesArray[j].push([number1, number2]);
-            }
-        }
-        numbers.splice(1, 0, numbers.pop());
-    }
-    if (double) {
-        var newMatches = [];
-        for (var match of matchesArray) {
-            var arr = [];
-            for (var m of match) arr.push([m[1], m[0]]);
-            newMatches.push(arr);
-        }
-        for (var newMatch of newMatches) matchesArray.push(newMatch);
-    }
-    return matchesArray;
-}
-
 const tableDiv = getId("table-div");
 const matchesDiv = getId("matches-div");
 const button = getId("button");
 
-function init() {
-    var doubleRound = (roundsAmount == 2) ? true : false;
-    var rounds = createMatches(teams.length, doubleRound);
+let round = 0;
+let match = 0;
 
-    for (var t = 0; t < teams.length; t++) {
+function init() {
+    let doubleRound = (roundsAmount == 2) ? true : false;
+    let rounds = createMatches(teams.length, doubleRound);
+
+    // Creating teams objects
+    for (let t = 0; t < teams.length; t++) {
         teams[t].stats = {
             points: 0,
             goalsScored: 0, goalsLost: 0,
@@ -71,10 +21,11 @@ function init() {
     }
     initTeamsTable(teams);
 
+    // Creating matches array
     totalRounds = rounds.length;
     matchesPerRound = rounds[0].length;
-    for (var i = 0; i < rounds.length; i++) {
-        for (var match of rounds[i]) {
+    for (let i = 0; i < rounds.length; i++) {
+        for (let match of rounds[i]) {
             matches.push(new Match(teams[match[0] - 1], teams[match[1] - 1]));
         }
     }
@@ -83,21 +34,21 @@ function init() {
 }
 
 function initTeamsTable(teamsTable) {
-    var table = document.createElement("table");
+    let table = document.createElement("table");
     table.className = "teams-table";
 
-    var thr = document.createElement("tr");
+    let thr = document.createElement("tr");
     thr.innerHTML = `<th>M</th><th>Drużyna</th><th>Pkt</th><th>+</th><th>-</th><th>+/-</th><th>W</th><th>R</th><th>P</th>`;
     table.appendChild(thr);
 
-    for (var t = 0; t < teamsTable.length; t++) {
-        var tr = document.createElement("tr");
+    for (let t = 0; t < teamsTable.length; t++) {
+        let tr = document.createElement("tr");
         tr.innerHTML = `<td>${t + 1}</td><td><img src="${FLAGS_SRC}${teamsTable[t].link}"><div>${teamsTable[t].name}</div></td>`;
 
-        for (var key in teamsTable[t].stats) {
-            var stat = teamsTable[t].stats[key];
+        for (let key in teamsTable[t].stats) {
+            let stat = teamsTable[t].stats[key];
 
-            var td = document.createElement("td");
+            let td = document.createElement("td");
             td.innerHTML = stat;
             tr.appendChild(td);
         }
@@ -107,19 +58,19 @@ function initTeamsTable(teamsTable) {
     tableDiv.appendChild(table);
 
     setColors([
-        [COLOR_GREEN, green],
-        [COLOR_YELLOW, yellow],
-        [COLOR_WHITE, white],
-        [COLOR_RED, red],
+        [COLOR_GREEN, colors.green],
+        [COLOR_YELLOW, colors.yellow],
+        [COLOR_WHITE, colors.white],
+        [COLOR_RED, colors.red],
     ]);
 }
 
 function initMatchesTable() {
-    var firstIndex = round * matchesPerRound;
-    var table = document.createElement("table");
+    let firstIndex = round * matchesPerRound;
+    let table = document.createElement("table");
     table.id = "matches-table";
 
-    for (var i = firstIndex; i < firstIndex + matchesPerRound; i++) {
+    for (let i = firstIndex; i < firstIndex + matchesPerRound; i++) {
         createMatch(table, matches[i]);
     }
     matchesDiv.innerHTML = "";
@@ -127,16 +78,10 @@ function initMatchesTable() {
 }
 
 function createMatch(table, matchObj) {
-    var tr = document.createElement("tr");
+    let tr = document.createElement("tr");
 
-    var team1 = findTeam(matchObj.team1);
-    var team2 = findTeam(matchObj.team2);
-
-    // var preScore1 = getRandom(0, 3);
-    // var preScore2 = getRandom(0, 3);
-    
-    var preScore1 = "";
-    var preScore2 = "";
+    let team1 = findTeam(matchObj.team1);
+    let team2 = findTeam(matchObj.team2);
 
     tr.innerHTML =
     `<td>
@@ -144,7 +89,7 @@ function createMatch(table, matchObj) {
         <span>${team1.name}</span>
     </td>
     <td>
-        <input type="number" id="text1" disabled value="${preScore1}"><b>-</b><input type="number" id="text2" disabled value="${preScore2}">
+        <input type="number" id="text1" disabled value=""><b>-</b><input type="number" id="text2" disabled value="">
     </td>
     <td>
         <span>${team2.name}</span>
@@ -155,7 +100,7 @@ function createMatch(table, matchObj) {
 }
 
 function findTeam(id) {
-    for (var team of teams) {
+    for (let team of teams) {
         if (team.id == id) {
             return team;
         }
@@ -163,34 +108,34 @@ function findTeam(id) {
 }
 
 function setColors(colors) {
-    var trs = document.querySelectorAll("#teams-table tr:not(:first-child)");
+    let trs = document.querySelectorAll(".teams-table tr:not(:first-child)");
 
-    var allColors = [];
-    for (var array of colors) {
-        for (var i = 0; i < array[1]; i++) {
+    let allColors = [];
+    for (let array of colors) {
+        for (let i = 0; i < array[1]; i++) {
             allColors.push(array[0]);
         }
     }
-    for (var i = 0; i < trs.length; i++) {
+    for (let i = 0; i < trs.length; i++) {
         trs[i].style.backgroundColor = allColors[i];
     }
 }
 
 function startMatch() {
-    var elem = document.querySelectorAll("#matches-table tr")[match];
+    let elem = document.querySelectorAll("#matches-table tr")[match];
     elem.style.backgroundColor = "#ebebeb";
 
-    var input1 = elem.querySelector("#text1");
-    var input2 = elem.querySelector("#text2");
+    let input1 = elem.querySelector("#text1");
+    let input2 = elem.querySelector("#text2");
 
     input1.removeAttribute("disabled");
     input2.removeAttribute("disabled");
 
     button.onclick = function () {
-        var score1 = input1.value;
-        var score2 = input2.value;
+        let score1 = parseInt(input1.value);
+        let score2 = parseInt(input2.value);
 
-        if (score1 != "" && score2 != "") {
+        if (!isNaN(score1) && !isNaN(score2) && score1 >= 0 && score2 >= 0) {
             playMatch(input1, input2);
             elem.style.backgroundColor = "white";
         }
@@ -198,20 +143,17 @@ function startMatch() {
 }
 
 function playMatch(input1, input2) {
-    var score1 = input1.value;
-    var score2 = input2.value;
+    let score1 = parseInt(input1.value);
+    let score2 = parseInt(input2.value);
 
     input1.setAttribute("disabled", "");
     input2.setAttribute("disabled", "");
 
-    score1 = parseInt(score1);
-    score2 = parseInt(score2);
-
-    var matchObject = matches[round * matchesPerRound + match];
+    let matchObject = matches[round * matchesPerRound + match];
     matchObject.playMatch(score1, score2);
     scoreMatchTeam(score1, score2, findTeam(matchObject.team1), findTeam(matchObject.team2));
 
-    var sorted = sortTeams(teams);
+    let sorted = sortTeams(teams);
     setTableTeams(sorted);
 
     match++;
@@ -231,11 +173,12 @@ function playMatch(input1, input2) {
         getId("round").innerHTML = "Runda " + (round + 1);
     }
     startMatch();
+    return true;
 }
 
 function sortTeams(teams) {
-    var table = [];
-    for (var team of teams) {
+    let table = [];
+    for (let team of teams) {
         table.push(team);
     }
 
@@ -243,21 +186,21 @@ function sortTeams(teams) {
         return y.stats.points - x.stats.points;
     });
 
-    var pointGroups = [];
-    var maxPoints = totalRounds * 3 + 1;
+    let pointGroups = [];
+    let maxPoints = totalRounds * POINTS_FOR_VICTORY + 1;
 
-    for (var i = 0; i < maxPoints; i++) {
+    for (let i = 0; i < maxPoints; i++) {
 
-        var theSame = [];
-        for (var team of table) {
+        let theSame = [];
+        for (let team of table) {
             if (team.stats.points == i) {
                 theSame.push(team);
             }
         }
 
         theSame.sort(function (x, y) {
-            var xGoals = x.stats.goalsScored - x.stats.goalsLost;
-            var yGoals = y.stats.goalsScored - y.stats.goalsLost;
+            let xGoals = x.stats.goalsScored - x.stats.goalsLost;
+            let yGoals = y.stats.goalsScored - y.stats.goalsLost;
 
             return yGoals - xGoals;
         });
@@ -270,9 +213,9 @@ function sortTeams(teams) {
         }
     }
 
-    var newTeams = [];
-    for (var i = pointGroups.length - 1; i >= 0; i--) {
-        for (var team of pointGroups[i]) {
+    let newTeams = [];
+    for (let i = pointGroups.length - 1; i >= 0; i--) {
+        for (let team of pointGroups[i]) {
             newTeams.push(team);
         }
     }
@@ -282,17 +225,17 @@ function sortTeams(teams) {
 function checkGoalsScored(teamsArray) {
     if (teamsArray.length == 1) return teamsArray;
 
-    var goals = [];
-    for (var team of teamsArray) {
+    let goals = [];
+    for (let team of teamsArray) {
         if (goals.indexOf(team.stats.goals) != -1) continue;
         goals.push(team.stats.goals);
     }
 
-    var newTeams = [];
-    for (var i = 0; i < goals.length; i++) {
+    let newTeams = [];
+    for (let i = 0; i < goals.length; i++) {
 
-        var theSame = [];
-        for (var team of teamsArray) {
+        let theSame = [];
+        for (let team of teamsArray) {
             if (team.stats.goals == goals[i]) {
                 theSame.push(team);
             }
@@ -303,7 +246,7 @@ function checkGoalsScored(teamsArray) {
             theSame.sort(function (x, y) {
                 return y.stats.goalsScored - x.stats.goalsScored;
             });
-            for (var theSameTeam of theSame) {
+            for (let theSameTeam of theSame) {
                 newTeams.push(theSameTeam);
             }
         }
@@ -324,82 +267,77 @@ function scoreMatchTeam(score1, score2, team1, team2) {
 
     if (score1 > score2) {
 
-        team1.stats.points += 3;
-        team1.stats.wins += 1;
-        team2.stats.losses += 1;
+        team1.stats.points += POINTS_FOR_VICTORY;
+        team1.stats.wins++;
+        team2.stats.losses++;
 
     } else if (score1 < score2) {
 
-        team2.stats.points += 3;
-        team2.stats.wins += 1;
-        team1.stats.losses += 1;
+        team2.stats.points += POINTS_FOR_VICTORY;
+        team2.stats.wins++;
+        team1.stats.losses++;
 
     } else if (score1 == score2) {
 
-        team1.stats.points += 1;
-        team2.stats.points += 1;
+        team1.stats.points += POINTS_FOR_DRAW;
+        team2.stats.points += POINTS_FOR_DRAW;
 
-        team1.stats.draws += 1;
-        team2.stats.draws += 1;
+        team1.stats.draws++;
+        team2.stats.draws++;
     }
 }
 
 function setTableTeams(teamsTable) {
-    var trs = document.querySelectorAll("#teams-table tr:not(:first-child)");
+    let trs = document.querySelectorAll(".teams-table tr:not(:first-child)");
+    
+    const TEAM_COLLUMN = 1;
+    const FIRST_STATS_COLLUMN = 2;
 
-    for (var i = 0; i < trs.length; i++) {
-        var tds = trs[i].querySelectorAll("td");
-        tds[1].innerHTML = `<img src="${FLAGS_SRC}${teamsTable[i].link}"><div>${teamsTable[i].name}</div>`;
+    for (let i = 0; i < trs.length; i++) {
+        let tds = trs[i].querySelectorAll("td");
+        tds[TEAM_COLLUMN].innerHTML = `<img src="${FLAGS_SRC}${teamsTable[i].link}"><div>${teamsTable[i].name}</div>`;
 
-        var stats = [];
-        for (var key in teamsTable[i].stats) {
+        let stats = [];
+        for (let key in teamsTable[i].stats) {
             stats.push(teamsTable[i].stats[key]);
         }
 
-        for (var j = 2; j < 2 + stats.length; j++) {
-            tds[j].innerHTML = stats[j - 2];
+        for (let j = FIRST_STATS_COLLUMN; j < FIRST_STATS_COLLUMN + stats.length; j++) {
+            tds[j].innerHTML = stats[j - FIRST_STATS_COLLUMN];
         }
     }
 }
 
 function endGame() {
     roundsTable();
-
-    var obj = {};
-    obj["teams"] = teams;
-    obj["matches"] = matches;
-    obj["colors"] = [
-        green, yellow, white, red
-    ];
-    console.log(obj);
-    serverPost(LEAGUE_PHP_FILE, { obj: JSON.stringify(obj) }, function (text) {
-    });
 }
 
 function roundsTable() {
-    var finalTeams = placesAfterRounds[placesAfterRounds.length - 1];
-    var colorsArray = getColorsArray();
+    let finalTeams = placesAfterRounds[placesAfterRounds.length - 1];
+    let colorsArray = getColorsArray();
 
-    var table = document.createElement("table");
-    table.id = "teams-table";
-    table.className = "places-table";
+    let table = document.createElement("table");
+    table.className = "places-table teams-table";
 
-    var thr = document.createElement("tr");
+    let thr = document.createElement("tr");
     thr.innerHTML = "<th>Drużyna</th>";
 
-    for(var i = 0; i < totalRounds; i++) thr.innerHTML += `<th>${i + 1}</th>`;
+    for(let i = 0; i < totalRounds; i++) thr.innerHTML += `<th>${i + 1}</th>`;
     table.appendChild(thr);
 
-    for (var t = 0; t < teams.length; t++) {
-        var tr = document.createElement("tr");
+    for (let t = 0; t < teams.length; t++) {
+        let tr = document.createElement("tr");
         tr.innerHTML = `<td><img src="${FLAGS_SRC}${finalTeams[t].link}"><div>${finalTeams[t].name}</div></td>`;
 
-        var teamId = finalTeams[t].id;
-        for(var r = 0; r < placesAfterRounds.length; r++) {
-            var place = placesAfterRounds[r].findIndex(function(obj) {
+        let teamId = finalTeams[t].id;
+        for(let r = 0; r < placesAfterRounds.length; r++) {
+            let place = placesAfterRounds[r].findIndex(function(obj) {
                 return obj.id == teamId;
             });
-            tr.innerHTML += `<td style='background-color: ${colorsArray[place]};'>${place + 1}</td>`;
+
+            const truePlace = place + 1;
+            const placeText = (truePlace == 1) ? `<b>${truePlace}</b>` : truePlace;
+            tr.innerHTML += `<td style='background-color: ${colorsArray[place]};'>${placeText}</td>`;
         }
         table.appendChild(tr);
     }
@@ -407,18 +345,18 @@ function roundsTable() {
 }
 
 function getColorsArray() {
-    var variables = [
+    let variables = [
         COLOR_GREEN, COLOR_YELLOW, COLOR_WHITE, COLOR_RED
     ];
-    var amounts = [
-        green, yellow, white, red
+    let amounts = [
+        colors.green, colors.yellow, colors.white, colors.red
     ];
 
-    var colors = [];
-    for(var c = 0; c < amounts.length; c++) {
-        for(var i = 0; i < amounts[c]; i++) {
-            colors.push(variables[c]);
+    let colorsArray = [];
+    for(let c = 0; c < amounts.length; c++) {
+        for(let i = 0; i < amounts[c]; i++) {
+            colorsArray.push(variables[c]);
         }
     }
-    return colors;
+    return colorsArray;
 }

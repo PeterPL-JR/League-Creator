@@ -153,7 +153,9 @@ function getTeam(id) {
 }
 
 function mouseInPot(potIndex) {
-    allPots[potIndex].querySelector("tr:first-child").className = "pot-selected";
+    if(draggedTeam != null) {
+        allPots[potIndex].querySelector("tr:first-child").className = "pot-selected";
+    }
 }
 function mouseOutPot(potIndex) {
     allPots[potIndex].querySelector("tr:first-child").className="";

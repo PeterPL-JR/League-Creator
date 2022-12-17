@@ -109,3 +109,13 @@ function count(array, element) {
     }
     return counter;
 }
+
+function isStringEmpty(string) {
+    for(let i = 0; i < string.length; i++) {
+        const ch = string[i];
+        if(ch != " " && ch != "\t" && ch != "\n") {
+            return false;
+        }
+    }
+    return true;
+}

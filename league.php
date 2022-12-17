@@ -61,13 +61,17 @@ if (isset($_POST['get'])) {
     <title>League Creator</title>
     <script src="library.js"></script>
     <script src="variables.js"></script>
+    <script src="matches.js"></script>
     <link rel="stylesheet" href="league.css" type="text/css">
 </head>
-<body>
+<body onload="initMenuPage();">
 
 <div id="init-div">
+    <div style="font-size: 23px;">Nazwa turnieju</div>
+    <input type="text" id="league-name" placeholder="Turniej 1">
+    
     <div style="font-size: 23px;">Ilość drużyn</div>
-    <input type="number" id="teams-amount"value="4"><br>
+    <input type="number" id="teams-amount" value="4"><br>
     <button id="save-amount">Zapisz</button><br>
     
     <div id="init-properties-div">
@@ -75,7 +79,7 @@ if (isset($_POST['get'])) {
             <div></div><input type="number" value="0" id="green"><br>
             <div></div><input type="number" value="0" id="yellow"><br>
             <div></div><input type="number" value="0" id="red"><br>
-            <div></div><input type="number" value="0" id="whitea"><br>
+            <div></div><input type="number" value="0" id="whitea" readonly><br>
         </div><br>
 
         <div style="font-size: 23px;">Ilość Kolejek (1-2)</div>

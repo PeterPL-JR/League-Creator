@@ -10,13 +10,35 @@ body {
 }
 
 /* INIT DIV */
-#teams-amount {
-    width: 240px;
+input#teams-amount, input#league-name {
+    width: 350px;
     font-size: 30px;
+    text-align: center;
+    height: 36px;
+    line-height: 36px;
+
+    padding: 3px;
+    border: solid black 1px;
+    border-radius: 2px;
 }
-#rounds-amount {
+input#rounds-amount {
     width: 200px;
     font-size: 20px;
+}
+input#league-name::placeholder {
+    color: #a9a9a9;
+    font-size: 25px;
+}
+
+input#teams-amount:read-only, input#league-name:read-only {
+    padding: 3px;
+    border: solid black 1px;
+    border-radius: 2px;
+    background-color: white !important;
+}
+
+input#league-name {
+    font-size: 26px;
 }
 
 #inputs-div {
@@ -151,6 +173,9 @@ body {
 
 input::-webkit-inner-spin-button, input::-webkit-outer-spin-button {
     -webkit-appearance: none;
+}
+input[type="number"] {
+    appearance: textfield;
 }
 
 input[type="number"] {
