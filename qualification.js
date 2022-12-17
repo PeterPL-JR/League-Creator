@@ -101,32 +101,34 @@ function updateTeam(id) {
 }
 
 function startMoving(id) {
+    document.body.style.cursor = "pointer";
     draggedTeam = id;
-
+    
     const elem = getTeam(id);
     elem.className = "team-elem team-selected";
     elem.style.visibility = "hidden";
-
+    
     flyingElem = elem.cloneNode(elem);
     flyingElem.className = "team-elem team-selected flying-elem";
     flyingElem.mouseItem = null;
     document.body.appendChild(flyingElem);
-
+    
     const beginX = mouseX - elem.offsetLeft;
     const beginY = mouseY - elem.offsetTop;
-
+    
     const scrollX = window.scrollX;
     const scrollY = window.scrollY;
-
+    
     dragBegin = {x:beginX, y:beginY};
     scrollBegin = {x:scrollX, y:scrollY};
-
+    
     document.body.oncontextmenu = function() {
         return false;
     }
     teamMove();
 }
-function stopMoving() {    
+function stopMoving() {
+    document.body.style.cursor = "default";
     const elem = getTeam(draggedTeam);
     if(elem != null) {
         elem.className = "team-elem";
@@ -137,6 +139,10 @@ function stopMoving() {
     dragBegin = null;
     scrollBegin = null
     flyingElem = null;
+
+    for(let i = 0; i < _POTS; i++) {
+        mouseOutPot(i);
+    }
 }
 
 function teamMove() {

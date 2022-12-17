@@ -70,7 +70,7 @@ div#teams-amount {
     border: solid gray 1px;
     margin: 5px;
     background-color: #f9f9f9;
-    cursor: default;
+    cursor: pointer;
 }
 .team-elem img {
     position: absolute;
@@ -90,6 +90,7 @@ div#teams-amount {
     position: absolute;
     z-index: 3;
     visibility: visible !important;
+    pointer-events: none;
 }
 
 .team-selected {
