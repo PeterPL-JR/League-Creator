@@ -43,7 +43,7 @@ function initTeamsTable(teamsTable) {
 
     for (let t = 0; t < teamsTable.length; t++) {
         let tr = document.createElement("tr");
-        tr.innerHTML = `<td>${t + 1}</td><td><img src="${FLAGS_SRC}${teamsTable[t].link}"><div>${teamsTable[t].name}</div></td>`;
+        tr.innerHTML = `<td>${t + 1}</td><td>${getImageElement(teamsTable[t].link)}<div>${teamsTable[t].name}</div></td>`;
 
         for (let key in teamsTable[t].stats) {
             let stat = teamsTable[t].stats[key];
@@ -85,7 +85,7 @@ function createMatch(table, matchObj) {
 
     tr.innerHTML =
     `<td>
-        <img src='${FLAGS_SRC}${team1.link}'>
+        ${getImageElement(team1.link)}
         <span>${team1.name}</span>
     </td>
     <td>
@@ -93,10 +93,18 @@ function createMatch(table, matchObj) {
     </td>
     <td>
         <span>${team2.name}</span>
-        <img src='${FLAGS_SRC}${team2.link}'>
+        ${getImageElement(team2.link)}
     </td>`;
 
     table.appendChild(tr);
+}
+
+function getImageElement(src) {
+    let imageHTML = `<img src="${FLAGS_SRC}${src}">`;
+    if(!src) {
+        imageHTML = "";
+    }
+    return imageHTML;
 }
 
 function setColors(colors) {
@@ -176,7 +184,7 @@ function setTableTeams(teamsTable) {
 
     for (let i = 0; i < trs.length; i++) {
         let tds = trs[i].querySelectorAll("td");
-        tds[TEAM_COLLUMN].innerHTML = `<img src="${FLAGS_SRC}${teamsTable[i].link}"><div>${teamsTable[i].name}</div>`;
+        tds[TEAM_COLLUMN].innerHTML = `${getImageElement(teamsTable[i].link)}<div>${teamsTable[i].name}</div>`;
 
         let stats = [];
         for (let key in teamsTable[i].stats) {
@@ -208,7 +216,7 @@ function roundsTable() {
 
     for (let t = 0; t < teams.length; t++) {
         let tr = document.createElement("tr");
-        tr.innerHTML = `<td><img src="${FLAGS_SRC}${finalTeams[t].link}"><div>${finalTeams[t].name}</div></td>`;
+        tr.innerHTML = `<td>${getImageElement(finalTeams[t].link)}<div>${finalTeams[t].name}</div></td>`;
 
         let teamId = finalTeams[t].id;
         for(let r = 0; r < placesAfterRounds.length; r++) {

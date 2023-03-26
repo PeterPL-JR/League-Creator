@@ -128,6 +128,9 @@ function clickMenuButton() {
 }
 
 function clickStartButton() {
+    const MIN_ID = 1_000_000;
+    const MAX_ID = 9_999_999;
+
     let inputs = document.querySelectorAll(".init-team-div");
     let array = [];
 
@@ -145,7 +148,10 @@ function clickStartButton() {
         const bufferTeams = [];
         for (let elem of array) {
             let teamObj = findTeamByName(serverTeams, elem);
-            if (teamObj != null) {
+            if(teamObj == null) {
+                teamObj = {name: elem, id: getRandom(MIN_ID, MAX_ID)};
+            }
+            if(!isStringEmpty(teamObj.name)) {
                 bufferTeams.push(teamObj);
             }
         }
@@ -186,4 +192,8 @@ function editColors() {
     let emptyRows = teamsAmount - sum;
     if(emptyRows < 0) emptyRows = 0;
     document.querySelector(`#colors-div input#whitea`).value = emptyRows;
+}
+
+function getRandom(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
