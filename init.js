@@ -9,7 +9,7 @@ let totalRounds; // Rounds Amount
 let matchesPerRound;
 
 const MIN_TEAMS = 4;
-const MAX_TEAMS = 10;
+const MAX_TEAMS = 12;
 
 let placesAfterRounds = [];
 let colors = {};
