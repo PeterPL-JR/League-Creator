@@ -1,12 +1,19 @@
 const THEMES_PATH = "styles/themes/";
 
-const LIGHT_THEME = THEMES_PATH + "theme-light.css";
-const DARK_THEME = THEMES_PATH + "theme-dark.css";
+const LIGHT_THEME = 0;
+const DARK_THEME = 1;
+
+const THEMES_FILES_PATHS = ["theme-light.css", "theme-dark.css"];
 let currentTheme = DARK_THEME;
 
 const settingsIcon = document.getElementById("settings");
 
 function initTheme() {
+    let savedTheme = localStorage.getItem("league-creator-theme");
+    if(savedTheme) {
+        currentTheme = savedTheme;
+    }
+
     setTheme(currentTheme);
     settingsIcon.onclick = function() {
         changeTheme();
@@ -20,5 +27,7 @@ function changeTheme() {
 
 function setTheme(theme) {
     let link = document.getElementById("theme");    
-    link.href = theme;
+    link.href = THEMES_PATH + THEMES_FILES_PATHS[theme];
+
+    localStorage.setItem("league-creator-theme", theme);
 }
