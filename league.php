@@ -63,9 +63,12 @@ if (isset($_POST['get'])) {
     <script src="scripts/matches.js"></script>
     <script src="scripts/functions.js"></script>
     <script src="scripts/variables.js"></script>
+    
     <link rel="stylesheet" href="league.css" type="text/css">
+    <link id='theme' rel="stylesheet" href="styles/themes/theme-light.css" type='text/css'>
 </head>
-<body onload="initMenuPage();">
+<body onload="initMenuPage(); initTheme();">
+<img src="images/user.png" id='settings'>
 
 <div id="init-div">
     <div style="font-size: 23px;">Nazwa turnieju</div>
@@ -98,6 +101,7 @@ if (isset($_POST['get'])) {
 </div>
     <script src="init.js"></script>
     <script src="league.js"></script>
+    <script src="scripts/themes.js"></script>
 </body>
 </html>
 <?php }?>

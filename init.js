@@ -116,12 +116,10 @@ function clickMenuButton() {
 
         // Modify League-Name Input
         nameInput.setAttribute("readonly", "true");
-        nameInput.style.backgroundColor = "#f9f9f9";
         nameInput.value = leagueName;
         
         // Modify Teams-Amount Input
         amountInput.setAttribute("readonly", "true");
-        amountInput.style.backgroundColor = "#f9f9f9";
 
         initPreferencesPage();
     }

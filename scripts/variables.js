@@ -8,7 +8,7 @@ const SCROLL_BUTTON = 1;
 const RIGHT_BUTTON = 2;
 
 // Colors
-const COLOR_GREEN = "#ccffcc";
-const COLOR_YELLOW = "#ffffcc";
-const COLOR_RED = "#ffcccc";
-const COLOR_WHITE = "#fefefe";
+const COLOR_GREEN = "var(--color-green)";
+const COLOR_YELLOW = "var(--color-yellow)";
+const COLOR_RED = "var(--color-red)";
+const COLOR_WHITE = "var(--back-color)";

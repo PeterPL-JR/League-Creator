@@ -123,7 +123,7 @@ function setColors(colors) {
 
 function startMatch() {
     let elem = document.querySelectorAll("#matches-table tr")[match];
-    elem.style.backgroundColor = "#ebebeb";
+    elem.style.backgroundColor = "var(--select-color-1)";
 
     let input1 = elem.querySelector("#text1");
     let input2 = elem.querySelector("#text2");
@@ -137,7 +137,7 @@ function startMatch() {
 
         if (!isNaN(score1) && !isNaN(score2) && score1 >= 0 && score2 >= 0) {
             playMatch(input1, input2);
-            elem.style.backgroundColor = "white";
+            elem.style.backgroundColor = "var(--back-color)";
         }
     }
 }

@@ -1,0 +1,24 @@
+/* Dark theme */
+:root {
+    --back-color: black;
+    --fore-color: white;
+
+    --back-color-2: #363636;
+    --fore-color-2: #f9f9f9;
+
+    --select-color-1: #161616;
+    --select-color-2: #232323;
+    
+    --border-color: #808080;
+    --place-holder-color: #565656;
+    
+    --button-color-1: #171717;
+    --button-color-2: #232323;
+}
+
+/* Table colors */
+:root {
+    --color-green: #0b5a00;
+    --color-yellow: #7e6721;
+    --color-red: #6d0000;
+}

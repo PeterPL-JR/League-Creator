@@ -1,0 +1,24 @@
+/* Light theme */
+:root {
+    --back-color: white;
+    --fore-color: black;
+
+    --back-color-2: #f9f9f9;
+    --fore-color-2: #464646;
+
+    --select-color-1: #e9e9e9;
+    --select-color-2: #dcdcdc;
+    
+    --border-color: gray;
+    --place-holder-color: #a9a9a9;
+    
+    --button-color-1: #e9e9e9;
+    --button-color-2: #dcdcdc;
+}
+
+/* Table colors */
+:root {
+    --color-green: #ccffcc;
+    --color-yellow: #ffffcc;
+    --color-red: #ffcccc;
+}

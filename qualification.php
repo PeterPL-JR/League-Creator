@@ -5,13 +5,17 @@
     <title>League Qualification</title>
     <link rel="stylesheet" href="league.css" type="text/css">
     <link rel="stylesheet" href="qualification.css" type="text/css">
+    <link rel="stylesheet" href="colors.css" type="text/css">
+    <link id='theme' rel="stylesheet" href="styles/themes/theme-light.css" type='text/css'>
 
     <script src="scripts/library.js"></script>
     <script src="scripts/matches.js"></script>
     <script src="scripts/functions.js"></script>
     <script src="scripts/variables.js"></script>
 </head>
-<body>
+<body onload="initTheme();">
+<img src="images/user.png" id='settings'>
+
     <div id="pots"></div>
     <div id="container">
         <div id="input-div">
@@ -22,5 +26,6 @@
         <div id="teams"></div>
     </div>
     <script src="qualification.js"></script>
+    <script src="scripts/themes.js"></script>
 </body>
 </html>
