@@ -22,8 +22,8 @@ function init() {
     initTeamsTable(teams);
 
     // Creating matches array
-    totalRounds = rounds.length;
-    matchesPerRound = rounds[0].length;
+    totalMatchdays = rounds.length;
+    matchesPerMatchday = rounds[0].length;
     for (let i = 0; i < rounds.length; i++) {
         for (let match of rounds[i]) {
             matches.push(new Match(teams[match[0] - 1], teams[match[1] - 1]));
@@ -60,17 +60,17 @@ function initTeamsTable(teamsTable) {
     setColors([
         [COLOR_GREEN, colors.green],
         [COLOR_YELLOW, colors.yellow],
-        [COLOR_WHITE, colors.white],
+        [COLOR_DEFAULT, colors.default],
         [COLOR_RED, colors.red],
     ]);
 }
 
 function initMatchesTable() {
-    let firstIndex = round * matchesPerRound;
+    let firstIndex = round * matchesPerMatchday;
     let table = document.createElement("table");
     table.id = "matches-table";
 
-    for (let i = firstIndex; i < firstIndex + matchesPerRound; i++) {
+    for (let i = firstIndex; i < firstIndex + matchesPerMatchday; i++) {
         createMatch(table, matches[i]);
     }
     matchesDiv.innerHTML = "";
@@ -149,21 +149,21 @@ function playMatch(input1, input2) {
     input1.setAttribute("disabled", "");
     input2.setAttribute("disabled", "");
 
-    let matchObject = matches[round * matchesPerRound + match];
+    let matchObject = matches[round * matchesPerMatchday + match];
     matchObject.playMatch(score1, score2);
-    scoreMatchTeam(score1, score2, findTeam(teams, matchObject.team1), findTeam(teams, matchObject.team2));
+    scoreMatchPoints(score1, score2, findTeam(teams, matchObject.team1), findTeam(teams, matchObject.team2));
 
     let sorted = sortTeams(teams);
     setTableTeams(sorted);
 
     match++;
-    if (match >= matchesPerRound) {
+    if (match >= matchesPerMatchday) {
         placesAfterRounds.push(sorted);
 
         match = 0;
         round++;
 
-        if (round >= totalRounds) {
+        if (round >= totalMatchdays) {
             endGame();
             button.remove();
             return;
@@ -211,7 +211,7 @@ function roundsTable() {
     let thr = document.createElement("tr");
     thr.innerHTML = "<th>Drużyna</th>";
 
-    for(let i = 0; i < totalRounds; i++) thr.innerHTML += `<th>${i + 1}</th>`;
+    for(let i = 0; i < totalMatchdays; i++) thr.innerHTML += `<th>${i + 1}</th>`;
     table.appendChild(thr);
 
     for (let t = 0; t < teams.length; t++) {
@@ -235,10 +235,10 @@ function roundsTable() {
 
 function getColorsArray() {
     let variables = [
-        COLOR_GREEN, COLOR_YELLOW, COLOR_WHITE, COLOR_RED
+        COLOR_GREEN, COLOR_YELLOW, COLOR_DEFAULT, COLOR_RED
     ];
     let amounts = [
-        colors.green, colors.yellow, colors.white, colors.red
+        colors.green, colors.yellow, colors.default, colors.red
     ];
 
     let colorsArray = [];

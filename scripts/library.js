@@ -1,7 +1,9 @@
+/** Ajax function connecting to a PHP file by GET method */
 function serverGet(url, data, doFunction) {
     var request = new XMLHttpRequest();
     request.onreadystatechange = function() {
-        if(this.readyState == 4) {
+        const READY = 4;
+        if(this.readyState == READY) {
             doFunction(this.responseText);
         }
     }
@@ -14,10 +16,12 @@ function serverGet(url, data, doFunction) {
     request.send();
 }
 
+/** Ajax function connecting to a PHP file by POST method */
 function serverPost(url, data, doFunction) {
     var request = new XMLHttpRequest();
     request.onreadystatechange = function() {
-        if(this.readyState == 4) {
+        const READY = 4;
+        if(this.readyState == READY) {
             doFunction(this.responseText);
         }
     }
@@ -32,10 +36,12 @@ function serverPost(url, data, doFunction) {
     request.send(dataString);
 }
 
+/** Shorter version of document.getElementById() */
 function getId(id) {
     return document.getElementById(id);
 }
 
+/** Shorter version of document.getElementsByClassName() */
 function getClass(className) {
     var array = document.getElementsByClassName(className);
     var newArray = [];
@@ -46,22 +52,26 @@ function getClass(className) {
     return newArray;
 }
 
+/** Create < script > element */
 function createScript(src) {
     var script = document.createElement("script");
     script.src = src;
     document.body.appendChild(script);
 }
 
+/** Create < div > element with CSS 'clear: both' value */
 function createClearBoth(container) {
     const div = document.createElement("div");
     div.style.setProperty("clear", "both");
     container.appendChild(div);
 }
 
+/** Function that returns a random integer number */
 function getRandom(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+/** Function checking if a character is a number */
 function isNumber(char) {
     const numbers = [];
     for(var i = 0; i <= 9; i++) {
@@ -73,6 +83,7 @@ function isNumber(char) {
     return false;
 }
 
+/** Function checking if a character is a letter */
 function isLetter(char) {
     const letters = [];
     for(var i = 0; i < 26; i++) {
@@ -88,6 +99,7 @@ function isLetter(char) {
     return false;
 }
 
+/** Shuffle an array */
 function shuffleArray(array) {
     var newArray = [];
     for(var elem of array) {
@@ -98,6 +110,7 @@ function shuffleArray(array) {
     return newArray;
 }
 
+/** Get an array with random numbers */
 function getRandomArray(length) {
     var array = [];
     for(var i = 0; i < length; i++) {
@@ -108,6 +121,7 @@ function getRandomArray(length) {
     return array;
 }
 
+/* Count an element in an array */
 function count(array, element) {
     var counter = 0;
     for(var elem of array) {
@@ -116,6 +130,7 @@ function count(array, element) {
     return counter;
 }
 
+/** Function checking if a string is empty */
 function isStringEmpty(string) {
     for(let i = 0; i < string.length; i++) {
         const ch = string[i];
@@ -126,6 +141,7 @@ function isStringEmpty(string) {
     return true;
 }
 
+/** Concat a multidimentional array into an one-dimentional array */
 function concatArray(basicArray) {
     let array = [];
     if(basicArray.length == 0) return [];
@@ -138,4 +154,25 @@ function concatArray(basicArray) {
         }
     }
     return array;
+}
+
+/** Concat several arrays into one array */
+function concatArrays(...array) {
+    let newArray = [];
+    for(let arr of array) {
+        for(let elem of arr) {
+            newArray.push(elem);
+        }
+    }
+    return newArray;
+}
+
+/** Change all elements from the array to lowercase */
+function arrayToLower(array) {
+    let newArray = [];
+}
+
+/** Change all elements from the array to uppercase */
+function arrayToUpper(array) {
+
 }

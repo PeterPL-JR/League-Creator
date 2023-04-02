@@ -11,4 +11,4 @@ const RIGHT_BUTTON = 2;
 const COLOR_GREEN = "var(--color-green)";
 const COLOR_YELLOW = "var(--color-yellow)";
 const COLOR_RED = "var(--color-red)";
-const COLOR_WHITE = "var(--back-color)";
+const COLOR_DEFAULT = "var(--back-color)";

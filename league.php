@@ -70,33 +70,43 @@ if (isset($_POST['get'])) {
 <body onload="initMenuPage(); initTheme();">
 <img src="images/user.png" id='settings'>
 
-<div id="init-div">
+<!-- Container of tournament settings -->
+<div id="init-container">
+    <!-- Menu settings page -->
     <div style="font-size: 23px;">Nazwa turnieju</div>
     <input type="text" id="league-name" placeholder="Turniej 1">
-    
+
     <div style="font-size: 23px;">Ilość drużyn</div>
     <input type="number" id="teams-amount" value="4"><br>
+
     <button id="save-amount">Zapisz</button><br>
     
+    <!-- Settings page -->
     <div id="init-properties-div">
+        <!-- Colors settings -->
         <div id="colors-div">
-            <div></div><input type="number" value="0" id="green"><br>
-            <div></div><input type="number" value="0" id="yellow"><br>
-            <div></div><input type="number" value="0" id="red"><br>
-            <div></div><input type="number" value="0" id="whitea" readonly><br>
+            <div></div><input class='color-input' type="number" value="0" id="green-color"><br>
+            <div></div><input class='color-input' type="number" value="0" id="yellow-color"><br>
+            <div></div><input class='color-input' type="number" value="0" id="red-color"><br>
+            <div></div><input readonly class='color-input' type="number" value="0" id="default-color"><br>
         </div><br>
 
+        <!-- Number of rounds settings -->
         <div style="font-size: 23px;">Ilość Kolejek (1-2)</div>
         <input type="number" id="rounds-amount" min=1 max=2 value="1"><br>
-    </div><br><br>
+    </div>
     <div id="inputs-div"></div>
 </div>
 
-<div id="game-div">
+<!-- Container of the game -->
+<div id="game-container">
+    <!-- Teams table -->
     <div id="table-div"></div>
-    <div id="round">Runda 1</div>
     
+    <!-- Matches table -->
+    <div id="round">Runda 1</div>
     <div id="matches-div"></div>
+    
     <button id="button">Zagraj</button>
 </div>
     <script src="init.js"></script>
