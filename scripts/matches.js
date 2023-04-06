@@ -70,7 +70,7 @@ function sortTeams(teams) {
     table = sortByPoints(table);
 
     let pointGroups = [];
-    const _MAX_POINTS = totalMatchdays * POINTS_FOR_VICTORY + 1;
+    const _MAX_POINTS = matchdays * POINTS_FOR_VICTORY + 1;
 
     for (let i = 0; i < _MAX_POINTS; i++) {
 

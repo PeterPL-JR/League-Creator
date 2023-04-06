@@ -5,7 +5,7 @@ let leagueName; // Tournament name
 let teamsAmount; // Teams participating in the tournament
 let roundsAmount; // Rounds (First match/rematch)
 
-let totalMatchdays; // Matchdays
+let matchdays; // Matchdays
 let matchesPerMatchday; // Amout of matches per matchday
 
 const MIN_TEAMS = 3;
