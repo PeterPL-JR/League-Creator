@@ -1,3 +1,33 @@
+<?php
+
+include_once 'database.php';
+include_once 'php/functions.php';
+
+if(isset($_POST['find'])) {
+    $teams = [];
+
+    $text = $_POST['find'];
+    $query = mysqli_query($base, "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id WHERE confederations.name = 'UEFA' AND content LIKE '$text%' ORDER BY content;");
+
+    while($row = mysqli_fetch_assoc($query)) {
+        array_push($teams, get_team($row));
+    }
+    echo json_encode($teams);
+
+} else if(isset($_POST['confed'])) {
+    $teams = [];
+    
+    $con_name = $_POST['confed'];
+    $query = mysqli_query($base, "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id WHERE confederations.name = '$con_name';");
+    
+    while($row = mysqli_fetch_assoc($query)) {
+        array_push($teams, get_team($row));
+    }
+    echo json_encode($teams);
+    
+} else {
+?>
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -29,3 +59,4 @@
     <script src="scripts/themes.js"></script>
 </body>
 </html>
+<?php } ?>

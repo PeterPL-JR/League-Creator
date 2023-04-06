@@ -143,7 +143,7 @@ function clickStartButton() {
 
     // Check teams in DB
     const teamsArrayString = JSON.stringify(teamsBuffer1);
-    serverPost(LEAGUE_PHP_FILE, { get: teamsArrayString }, function (responceText) {
+    serverPost(LEAGUE_PHP_FILE, { script: GET_TEAMS_SCRIPT, data: teamsArrayString }, function (responceText) {
         let teamsBuffer2 = checkTeams(JSON.parse(responceText), teamsBuffer1);
 
         // Check all data
@@ -224,9 +224,8 @@ function checkTeamFromInput(index) {
     
     let value = input.value;
 
-    serverPost(LEAGUE_PHP_FILE, {check: value}, function(responceText) {
-        const TEAM_EXISTS = 1;
-        let foundTeams = parseInt(responceText);
-        checkDiv.style.visibility = (foundTeams == TEAM_EXISTS) ? "visible" : "hidden";
+    serverPost(LEAGUE_PHP_FILE, { script: CHECK_TEAM_SCRIPT, data: value }, function(responceText) {
+        let teamExists = JSON.parse(responceText);
+        checkDiv.style.visibility = (teamExists) ? "visible" : "hidden";
     });
 }

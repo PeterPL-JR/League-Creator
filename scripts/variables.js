@@ -1,5 +1,10 @@
+// PHP scripts
+const GET_TEAMS_SCRIPT = 0;
+const CHECK_TEAM_SCRIPT = 1;
+
 // PHP / SRC
 const LEAGUE_PHP_FILE = "league.php";
+const QUALIFICATION_PHP_FILE = "qualification.php";
 const FLAGS_SRC = "../create-mundial/flags/";
 
 // Mouse Buttons 

@@ -1,55 +1,47 @@
 <?php
-include 'database.php';
 
-function get_team($mysqli_row) {
-    return [
-        "name" => $mysqli_row['content'],
-        "link" => $mysqli_row['link'],
-        "id" => $mysqli_row['team_id']
-    ];
-}
+include_once 'database.php';
 
-if (isset($_POST['get'])) {
+include_once 'php/functions.php';
+include_once 'php/variables.php';
+
+/** Function that gets data of a team from DB */
+function get_teams($teams_names_array) {
+    global $base;
+
     $teams = [];
-    $array = json_decode($_POST['get']);
+    $array = json_decode($teams_names_array);
 
-    foreach($array as $team) {
-        $query = mysqli_query($base, "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = '$team';");
+    foreach($array as $team_name) {
+        $query = mysqli_query($base, "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = '$team_name';");
         while ($row = mysqli_fetch_assoc($query)) {
             array_push($teams, get_team($row));
         }
     }
     echo json_encode($teams)."";
-} else if(isset($_POST['check'])) {
-
-    $content = $_POST['check'];
-    $query = mysqli_query($base, "SELECT COUNT(*) FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = '$content';");
+}
+/** Function that checks if a team exists in DB */
+function check_team($team_name) {
+    global $base;
     
+    $query = mysqli_query($base, "SELECT COUNT(*) FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = '$team_name';");
     $amount = mysqli_fetch_row($query)[0];
-    echo $amount;
 
-} else if(isset($_POST['confed'])) {
-    $teams = [];
-    
-    $con_name = $_POST['confed'];
-    $query = mysqli_query($base, "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id WHERE confederations.name = '$con_name';");
-    
-    while($row = mysqli_fetch_assoc($query)) {
-        array_push($teams, get_team($row));
+    echo json_encode($amount == 1 ? TRUE : FALSE);
+}
+
+// Perform a function if script is defined or else display HTML page
+if(isset($_POST['script'])) {
+    // Script type
+    $script = $_POST['script']; 
+
+    // Perform functions
+    if($script == GET_TEAMS_SCRIPT) {
+        get_teams($_POST['data']);
     }
-    echo json_encode($teams);
-
-} else if(isset($_POST['find'])) {
-    $teams = [];
-
-    $text = $_POST['find'];
-    $query = mysqli_query($base, "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id WHERE confederations.name = 'UEFA' AND content LIKE '$text%' ORDER BY content;");
-
-    while($row = mysqli_fetch_assoc($query)) {
-        array_push($teams, get_team($row));
+    if($script == CHECK_TEAM_SCRIPT) {
+        check_team($_POST['data']);
     }
-    echo json_encode($teams);
-
 } else {
 ?>
 

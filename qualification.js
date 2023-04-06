@@ -20,7 +20,7 @@ let mouseY = null;
 const imagesObjs = {};
 
 function get() {
-    serverPost(LEAGUE_PHP_FILE, {confed: "UEFA"}, function(text) {
+    serverPost(QUALIFICATION_PHP_FILE, {confed: "UEFA"}, function(text) {
         allTeams = JSON.parse(text);
         for(let team of allTeams) {
             const img = document.createElement("img");
@@ -86,7 +86,7 @@ function createTeamsElements() {
     const inputText = teamsInput.value;
     const MAX_IN_ROW = 3;
 
-    serverPost(LEAGUE_PHP_FILE, {find: inputText}, function(text) {
+    serverPost(QUALIFICATION_PHP_FILE, {find: inputText}, function(text) {
         const teams = JSON.parse(text);
         teamsDiv.innerHTML="";
 
