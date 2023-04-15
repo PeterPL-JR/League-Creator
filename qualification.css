@@ -124,3 +124,8 @@ div#teams-amount {
     background-color: var(--select-color-2) !important;
     font-weight: bold;
 }
+
+select {
+    color: var(--fore-color);
+    background-color: var(--back-color);
+}

@@ -1,6 +1,7 @@
 // PHP scripts
 const GET_TEAMS_SCRIPT = 0;
 const CHECK_TEAM_SCRIPT = 1;
+const GET_ALL_TEAMS = 2;
 
 // PHP / SRC
 const LEAGUE_PHP_FILE = "league.php";

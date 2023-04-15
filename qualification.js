@@ -8,6 +8,8 @@ let potsLengths = [];
 const potsDiv = getId("pots");
 const teamsInput = getId("teams-input");
 const teamsDiv = getId("teams");
+const confedSelect = getId("confed-select");
+const teamsAmountDiv = getId("teams-amount");
 
 let draggedTeam = null;
 let dragBegin = null;
@@ -20,8 +22,8 @@ let mouseY = null;
 const imagesObjs = {};
 
 function get() {
-    getTeams("UEFA", "", function(json) {
-        allTeams = json;
+    serverPost(QUALIFICATION_PHP_FILE, {script: GET_ALL_TEAMS}, function(responceText) {
+        allTeams = JSON.parse(responceText);
 
         for(let team of allTeams) {
             const img = document.createElement("img");
@@ -35,7 +37,7 @@ function get() {
 get();
 
 function init() {
-    createTables(allTeams.length);
+    createTables(55);
     teamsInput.onkeyup = createTeamsElements;
 
     document.body.onmousedown = function(event) {
@@ -53,6 +55,12 @@ function init() {
     potsDiv.oncontextmenu = function() {
         return false;
     }
+
+    confedSelect.onchange = function() {
+        teamsInput.value = "";
+        createTeamsElements();
+    }
+
     createTeamsElements();
 }
 
@@ -91,11 +99,14 @@ function createTables(teamsAmount) {
 
 function createTeamsElements() {
     const inputText = teamsInput.value;
+    const confedSelected = confedSelect.value;
+
     const MAX_IN_ROW = 3;
 
-    getTeams("UEFA", inputText, function(json) {
+    getTeams(confedSelected, inputText, function(json) {
         const teams = json;
         teamsDiv.innerHTML="";
+        teamsAmountDiv.innerHTML = `(${teams.length})`;
 
         const usedTeams = concatArray(potsTeams);
         let teamsCounter = 0;

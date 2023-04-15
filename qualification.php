@@ -5,11 +5,20 @@ include_once 'database.php';
 include_once 'php/functions.php';
 include_once 'php/variables.php';
 
+define("TEAMS_QUERY", "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id");
+
 function get_teams($confed, $team_text) {
+    get_from_db("WHERE confederations.name = '$confed' AND content LIKE '$team_text%' ORDER BY content;");
+}
+function get_all_teams() {
+    get_from_db();
+}
+
+function get_from_db($where_clauses="") {
     global $base;
 
     $teams = [];
-    $query = mysqli_query($base, "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id WHERE confederations.name = '$confed' AND content LIKE '$team_text%' ORDER BY content;");
+    $query = mysqli_query($base, TEAMS_QUERY." ".$where_clauses);
 
     while($row = mysqli_fetch_assoc($query)) {
         array_push($teams, get_team($row));
@@ -24,6 +33,9 @@ if(isset($_POST['script'])) {
     // Perform functions
     if($script == GET_TEAMS_SCRIPT) {
         get_teams($_POST['confed'], $_POST['data']);
+    }
+    if($script == GET_ALL_TEAMS) {
+        get_all_teams();
     }
 } else {
 ?>
@@ -48,9 +60,23 @@ if(isset($_POST['script'])) {
     <div id="pots"></div>
     <div id="container">
         <div id="input-div">
-            <h2>Drużyny</h2>
+            <h2>
+                Drużyny
+                <select id='confed-select'>
+                    <?php
+                    
+                    include_once 'database.php';
+
+                    $get_confeds = mysqli_query($base, "SELECT name FROM confederations;");
+                    while($row = mysqli_fetch_row($get_confeds)) {
+                        echo "<option>".$row[0]."</option>";
+                    }
+                    
+                    ?>
+                </select>
+            </h2>
             <input type="text" id="teams-input">
-            <div id="teams-amount">(55)</div>
+            <div id="teams-amount"></div>
         </div>
         <div id="teams"></div>
     </div>
