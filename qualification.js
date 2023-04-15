@@ -1,4 +1,3 @@
-const _POTS = 6;
 let allPots = [];
 let allTeams = [];
 
@@ -10,6 +9,16 @@ const teamsInput = getId("teams-input");
 const teamsDiv = getId("teams");
 const confedSelect = getId("confed-select");
 const teamsAmountDiv = getId("teams-amount");
+
+const teamsAmountInput = getId("teams-amount-input");
+const groupsAmountInput = getId("groups-amount-input");
+
+const buttonDrawStart = getId("button-draw-start");
+
+let _teams;
+
+let _groups;
+let _pots;
 
 let draggedTeam = null;
 let dragBegin = null;
@@ -37,7 +46,6 @@ function get() {
 get();
 
 function init() {
-    createTables(55);
     teamsInput.onkeyup = createTeamsElements;
 
     document.body.onmousedown = function(event) {
@@ -61,6 +69,13 @@ function init() {
         createTeamsElements();
     }
 
+    teamsAmountInput.onchange = groupsAmountInput.onchange = function() {
+        changeTables();
+    }
+
+    buttonDrawStart.onclick = draw;
+
+    changeTables();
     createTeamsElements();
 }
 
@@ -70,12 +85,35 @@ function getTeams(confed, teamText, action) {
     });
 }
 
-function createTables(teamsAmount) {
-    const TEAMS_IN_POT = parseInt(teamsAmount / _POTS);
+function changeTables() {
+    let teamsAmount = parseInt(teamsAmountInput.value);
+    let groupsAmount = parseInt(groupsAmountInput.value);
 
-    for(let i = 0; i < _POTS; i++) {
+    let potsAmount = Math.ceil(teamsAmount / groupsAmount);
+
+    const MAX_TEAMS = allTeams.length;
+    if(teamsAmount > MAX_TEAMS) {
+        teamsAmount = teamsAmountInput.value = _teams;
+    }
+
+    _teams = teamsAmount;
+    _groups = groupsAmount;
+    _pots = potsAmount;
+
+    createTables();
+}
+
+function createTables() {
+    potsDiv.innerHTML = "";
+
+    allPots = [];
+
+    potsTeams = [];
+    potsLengths = [];
+
+    for(let i = 0; i < _pots; i++) {
         potsTeams[i] = [];
-        potsLengths[i] = TEAMS_IN_POT;
+        potsLengths[i] = _groups;
 
         const table = document.createElement("table");
         table.className = "teams-table";
@@ -87,7 +125,7 @@ function createTables(teamsAmount) {
         titleRow.innerHTML = "Koszyk " + (i + 1);
         table.appendChild(titleRow);
 
-        for(let j = 0; j < TEAMS_IN_POT; j++) {
+        for(let j = 0; j < _groups; j++) {
             const row = document.createElement("tr");
             table.appendChild(row);
         }
@@ -105,6 +143,7 @@ function createTeamsElements() {
 
     getTeams(confedSelected, inputText, function(json) {
         const teams = json;
+
         teamsDiv.innerHTML="";
         teamsAmountDiv.innerHTML = `(${teams.length})`;
 
@@ -189,7 +228,7 @@ function stopMoving() {
     scrollBegin = null
     flyingElem = null;
 
-    for(let i = 0; i < _POTS; i++) {
+    for(let i = 0; i < _pots; i++) {
         mouseOutPot(i);
     }
 }
@@ -227,6 +266,7 @@ function choosePot(index) {
             createTeamsElements();
             stopMoving();
         }
+        checkDrawAvailable();
     }
 }
 
@@ -259,4 +299,17 @@ function removePotTeam(potIndex, teamIndex) {
         updatePot(potIndex);
         createTeamsElements();
     }
+}
+
+// Drawing
+function checkDrawAvailable() {
+    let teamsPushed = 0;
+
+    for(let pot of potsTeams) {
+        teamsPushed += pot.length;
+    }
+    buttonDrawStart.style.setProperty("display", (teamsPushed == _teams) ? "inline-block" : "none");
+}
+
+function draw() {
 }

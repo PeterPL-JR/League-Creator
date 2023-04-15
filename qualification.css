@@ -1,6 +1,9 @@
 body {
+    overflow-x: hidden;
     overflow-y: scroll;
+    
     user-select: none;
+    margin-top: 30px;
 }
 body *:not(input)::selection {
     background-color: #0000;
@@ -9,12 +12,13 @@ body *:not(input)::selection {
 #container {
     margin-top: 40px;
 }
-#pots {
+#pots {    
     margin: auto;
-    margin-top: 40px;
+    margin-top: 50px;
 
-    width: max-content;
+    width: 95%;
     height: max-content;
+    text-align: center;
 }
 #teams {
     width: max-content;
@@ -32,8 +36,8 @@ h2 {
     margin-left: 20px;
     margin-right: 20px;
 
-    float: left;
     border: none;
+    display: inline-block;
 }
 .teams-table img {
     position: absolute;
@@ -128,4 +132,11 @@ div#teams-amount {
 select {
     color: var(--fore-color);
     background-color: var(--back-color);
+}
+
+#pots-inputs-div input {
+    width: 300px;
+}
+#button-draw-start {
+    display: none;
 }

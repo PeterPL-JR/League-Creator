@@ -56,6 +56,15 @@ if(isset($_POST['script'])) {
 </head>
 <body onload="initTheme();">
 <img src="images/user.png" id='settings'>
+    <div id="pots-inputs-div">
+        <h2>Drużyny</h2>
+        <input type="number" id='teams-amount-input' value="54">
+        
+        <h2>Grupy</h2>
+        <input type="number" id='groups-amount-input' value="9">
+        
+        <br><button id='button-draw-start'>Losuj</button>
+    </div>    
 
     <div id="pots"></div>
     <div id="container">
