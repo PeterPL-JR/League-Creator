@@ -4,6 +4,9 @@ let allTeams = [];
 let potsTeams = [];
 let potsLengths = [];
 
+const potsContainer = getId("pots-container");
+const groupsContainer = getId("groups-container");
+
 const potsDiv = getId("pots");
 const teamsInput = getId("teams-input");
 const teamsDiv = getId("teams");
@@ -73,10 +76,36 @@ function init() {
         changeTables();
     }
 
-    buttonDrawStart.onclick = draw;
+    buttonDrawStart.onclick = function() {
+        potsContainer.style.setProperty("display", "none");
+        groupsContainer.style.setProperty("display", "block");
+        draw();
+    }
 
     changeTables();
     createTeamsElements();
+}
+
+function createTable(title, rowsNumber) {
+    const table = document.createElement("table");
+
+    const titleRow = document.createElement("tr");
+    titleRow.innerHTML = title;
+    table.appendChild(titleRow);
+
+    for(let j = 0; j < rowsNumber; j++) {
+        const row = document.createElement("tr");
+        table.appendChild(row);
+    }
+    return table;
+}
+function setTableTeam(table, rowIndex, teamObject) {
+    const div = document.createElement("div");
+    div.innerHTML = teamObject.name;
+
+    let row = table.querySelectorAll("tr")[rowIndex + 1];
+    row.appendChild(div);
+    row.appendChild(imagesObjs[teamObject.id]);
 }
 
 function getTeams(confed, teamText, action) {
@@ -115,20 +144,13 @@ function createTables() {
         potsTeams[i] = [];
         potsLengths[i] = _groups;
 
-        const table = document.createElement("table");
+        const table = createTable("Koszyk " + (i + 1), _groups);
         table.className = "teams-table";
+
         table.setAttribute("onmousedown", `choosePot(${i})`);
         table.setAttribute("onmouseenter", `mouseInPot(${i})`);
         table.setAttribute("onmouseleave", `mouseOutPot(${i})`);
-
-        const titleRow = document.createElement("tr");
-        titleRow.innerHTML = "Koszyk " + (i + 1);
-        table.appendChild(titleRow);
-
-        for(let j = 0; j < _groups; j++) {
-            const row = document.createElement("tr");
-            table.appendChild(row);
-        }
+        
         allPots.push(table);
         potsDiv.appendChild(table);
     }
@@ -245,6 +267,9 @@ function teamMove() {
 function getTeam(id) {
     return getId(`team-div-${id}`);
 }
+function findTeamObj(id) {
+    return findTeam(allTeams, id);
+}
 
 function mouseInPot(potIndex) {
     if(draggedTeam != null) {
@@ -279,14 +304,11 @@ function updatePot(index) {
     }
 
     for(let i = 0; i < pot.length; i++) {
-        const team = findTeam(allTeams, pot[i]);
-
-        const div = document.createElement("div");
-        div.innerHTML = team.name;
-
-        rows[i].appendChild(div);
-        rows[i].appendChild(imagesObjs[team.id]);
-        rows[i].setAttribute("onmousedown", `removePotTeam(${index}, ${i})`);
+        const team = findTeamObj(pot[i]);
+        const row = rows[i];
+        
+        setTableTeam(allPots[index], i, team);
+        row.setAttribute("onmousedown", `removePotTeam(${index}, ${i})`);
     }
 }
 function removePotTeam(potIndex, teamIndex) {
@@ -298,6 +320,8 @@ function removePotTeam(potIndex, teamIndex) {
         pot.splice(index, 1);
         updatePot(potIndex);
         createTeamsElements();
+
+        checkDrawAvailable();
     }
 }
 
@@ -312,4 +336,35 @@ function checkDrawAvailable() {
 }
 
 function draw() {
+    let groups = [];
+    for(let i = 0; i < _groups; i++) {
+        groups[i] = [];
+    }
+
+    for(let p = 0; p < _pots; p++) {
+        const pot = potsTeams[p];
+        
+        let groupIndex = 0;
+        while(pot.length > 0) {
+            let randomIndex = getRandom(0, pot.length - 1);
+            let randomTeam = pot[randomIndex];
+
+            pot.splice(randomIndex, 1);
+            groups[groupIndex].push(randomTeam);
+
+            groupIndex++;
+        }
+    }
+
+    for(let g = 0; g < groups.length; g++) {
+        const group = groups[g];
+
+        const table = createTable("Grupa " + toLetter(g), group.length);
+        table.className = "teams-table";
+
+        for(let t = 0; t < group.length; t++) {
+            setTableTeam(table, t, findTeamObj(group[t]));
+        }
+        groupsContainer.appendChild(table);
+    }
 }

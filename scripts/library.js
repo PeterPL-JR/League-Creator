@@ -167,12 +167,10 @@ function concatArrays(...array) {
     return newArray;
 }
 
-/** Change all elements from the array to lowercase */
-function arrayToLower(array) {
-    let newArray = [];
-}
+/** Get letter by index in the alphabet */
+function toLetter(letterIndex) {
+    const BASIC_LETTER = "A";
+    const BASIC_LETTER_CODE = BASIC_LETTER.charCodeAt(0);
 
-/** Change all elements from the array to uppercase */
-function arrayToUpper(array) {
-
+    return String.fromCharCode(BASIC_LETTER_CODE + letterIndex);
 }

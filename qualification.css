@@ -31,8 +31,16 @@ h2 {
     margin: 2px;
 }
 
+#pots-container {
+    display: block;
+}
+#groups-container {
+    width: 95%;
+    display: none;
+}
+
 .teams-table {
-    width: 220px;
+    width: 230px;
     margin-left: 20px;
     margin-right: 20px;
 
