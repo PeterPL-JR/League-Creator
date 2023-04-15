@@ -1,30 +1,30 @@
 <?php
 
 include_once 'database.php';
+
 include_once 'php/functions.php';
+include_once 'php/variables.php';
 
-if(isset($_POST['find'])) {
+function get_teams($confed, $team_text) {
+    global $base;
+
     $teams = [];
-
-    $text = $_POST['find'];
-    $query = mysqli_query($base, "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id WHERE confederations.name = 'UEFA' AND content LIKE '$text%' ORDER BY content;");
+    $query = mysqli_query($base, "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id WHERE confederations.name = '$confed' AND content LIKE '$team_text%' ORDER BY content;");
 
     while($row = mysqli_fetch_assoc($query)) {
         array_push($teams, get_team($row));
     }
     echo json_encode($teams);
+}
 
-} else if(isset($_POST['confed'])) {
-    $teams = [];
-    
-    $con_name = $_POST['confed'];
-    $query = mysqli_query($base, "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id WHERE confederations.name = '$con_name';");
-    
-    while($row = mysqli_fetch_assoc($query)) {
-        array_push($teams, get_team($row));
+if(isset($_POST['script'])) {
+    // Script type
+    $script = $_POST['script']; 
+
+    // Perform functions
+    if($script == GET_TEAMS_SCRIPT) {
+        get_teams($_POST['confed'], $_POST['data']);
     }
-    echo json_encode($teams);
-    
 } else {
 ?>
 
@@ -35,7 +35,6 @@ if(isset($_POST['find'])) {
     <title>League Qualification</title>
     <link rel="stylesheet" href="league.css" type="text/css">
     <link rel="stylesheet" href="qualification.css" type="text/css">
-    <link rel="stylesheet" href="colors.css" type="text/css">
     <link id='theme' rel="stylesheet" href="styles/themes/theme-light.css" type='text/css'>
 
     <script src="scripts/library.js"></script>

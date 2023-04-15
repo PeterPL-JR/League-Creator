@@ -20,8 +20,9 @@ let mouseY = null;
 const imagesObjs = {};
 
 function get() {
-    serverPost(QUALIFICATION_PHP_FILE, {confed: "UEFA"}, function(text) {
-        allTeams = JSON.parse(text);
+    getTeams("UEFA", "", function(json) {
+        allTeams = json;
+
         for(let team of allTeams) {
             const img = document.createElement("img");
             img.src = FLAGS_SRC + team.link;
@@ -55,6 +56,12 @@ function init() {
     createTeamsElements();
 }
 
+function getTeams(confed, teamText, action) {
+    serverPost(QUALIFICATION_PHP_FILE, {script: GET_TEAMS_SCRIPT, confed, data: teamText}, function(responceText) {
+        action(JSON.parse(responceText));
+    });
+}
+
 function createTables(teamsAmount) {
     const TEAMS_IN_POT = parseInt(teamsAmount / _POTS);
 
@@ -86,8 +93,8 @@ function createTeamsElements() {
     const inputText = teamsInput.value;
     const MAX_IN_ROW = 3;
 
-    serverPost(QUALIFICATION_PHP_FILE, {find: inputText}, function(text) {
-        const teams = JSON.parse(text);
+    getTeams("UEFA", inputText, function(json) {
+        const teams = json;
         teamsDiv.innerHTML="";
 
         const usedTeams = concatArray(potsTeams);
