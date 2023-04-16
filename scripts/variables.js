@@ -19,6 +19,9 @@ const COLOR_YELLOW = "var(--color-yellow)";
 const COLOR_RED = "var(--color-red)";
 const COLOR_DEFAULT = "var(--color-default)";
 
+const DEFAULT_MATCH_COLOR = COLOR_DEFAULT;
+const ACTIVE_MATCH_COLOR = "var(--select-color-1)";
+
 // IDs/Classes
 const TEAMS_TABLE_CLASS = "teams-table";
 const MATCHES_TABLE_ID = "matches-table";

@@ -80,7 +80,7 @@ function initTeamsInputs() {
 
         input.setAttribute("onkeyup", `checkTeamFromInput(${i});`);
         inputsDiv.appendChild(input);
-        
+
         // Div of team validity
         let div = document.createElement("div");
         div.className = "check-div";

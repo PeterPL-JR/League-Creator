@@ -31,6 +31,10 @@ h2 {
     margin: 2px;
 }
 
+input {
+    font-size: 28px;
+}
+
 #pots-container {
     display: block;
 }

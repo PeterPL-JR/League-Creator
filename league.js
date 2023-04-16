@@ -1,22 +1,48 @@
 const tableDiv = getId("table-div");
-const matchesDiv = getId("matches-div");
+const matchesDiv = getId("matches-table-div");
 const roundNameDiv = getId("round");
 const button = getId("button");
 
+const leftArrow = getId("left-arrow");
+const rightArrow = getId("right-arrow");
+
 let matchday = 0;
 let match = 0;
+
+let displayedMatchday = 0;
+
+let bufferScore1 = null;
+let bufferScore2 = null;
 
 /** Init the game */
 function init() {
     // Init teams/matches data
     initTeamsData();
     initMatchesData();
+    
+    initEvents();
 
     // Create initial HTML tables
     createTeamsTable(teams);
     createMatchesTable(matches);
     
     startMatch(); // Start first match
+}
+
+/** Init events */
+function initEvents() {
+    leftArrow.onclick = function() {
+        if(displayedMatchday > 0) {
+            displayedMatchday--;
+        }
+        displayMatchday(displayedMatchday);
+    }
+    rightArrow.onclick = function() {
+        if(displayedMatchday < matchdays - 1) {
+            displayedMatchday++;
+        }
+        displayMatchday(displayedMatchday);
+    }
 }
 
 /** Init array of teams objects */
@@ -82,21 +108,23 @@ function createTeamsTable(teamsTable) {
     ]);
 }
 /** Generate matches table of a matchday */
-function createMatchesTable(matchesArray) {
+function createMatchesTable(matchesArray, matchday=0) {
     // First match of a matchday
     let firstMatchIndex = matchday * matchesPerMatchday; 
-    
+
     // HTML table element
     let table = document.createElement("table");
     table.id = MATCHES_TABLE_ID;
 
     matchesDiv.innerHTML = "";
-    matchesDiv.appendChild(table);
+    matchesDiv.appendChild(table); 
 
     // Create HTML row elements of matches
     for (let i = firstMatchIndex; i < firstMatchIndex + matchesPerMatchday; i++) {
         createMatchRow(table, matchesArray[i]);
     }
+    // Set round name
+    setRoundName(matchday + 1);
 }
 
 /** Function that generates one row of a team (for teams table) */
@@ -139,9 +167,9 @@ function createMatchRow(table, matchObj) {
         <span>${team1.name}</span>
     </td>
     <td>
-        <input type="number" id="text1" disabled value="">
+        <input class='score-input' type="number" id="text1" disabled value="">
         <b>-</b>
-        <input type="number" id="text2" disabled value="">
+        <input class='score-input' type="number" id="text2" disabled value="">
     </td>
     <td>
         <span>${team2.name}</span>
@@ -213,27 +241,26 @@ function setRoundName(matchday) {
 
 /** Start a match (next in line) */
 function startMatch() {
-    // Match HTML element
-    let elem = document.querySelectorAll(`#${MATCHES_TABLE_ID} tr`)[match];
-    // Scores inputs
-    let input1 = elem.querySelector("#text1");
-    let input2 = elem.querySelector("#text2");
-    
+    changeArrows(matchday);
     // Enable
-    input1.removeAttribute("disabled");
-    input2.removeAttribute("disabled");
-    elem.style.backgroundColor = "var(--select-color-1)"; 
+    enableMatch(getMatchElem(match), true);
+
+    setScoresSaveEvents();
 
     // Play match button
     button.onclick = function() {
+        let matchElem = getMatchElem(match);
+        // Scores inputs
+        let input1 = getScoreInput(matchElem, 0);
+        let input2 = getScoreInput(matchElem, 1);
+
+        // Scores
         let score1 = parseInt(input1.value);
         let score2 = parseInt(input2.value);
 
         if(clickPlayButton(score1, score2)) {
             // Disable
-            input1.setAttribute("disabled", "");
-            input2.setAttribute("disabled", "");
-            elem.style.backgroundColor = COLOR_DEFAULT; 
+            enableMatch(matchElem, false);
         }
     }
 }
@@ -248,7 +275,7 @@ function playMatch(score1, score2) {
 
     // Score the match
     matchObject.playMatch(score1, score2);
-    scoreMatchPoints(score1, score2, team1, team2); 
+    scoreMatchPoints(score1, score2, team1, team2);
     // Sort table of teams
     let sorted = sortTeams(teams);
     setTableTeams(sorted);
@@ -260,12 +287,15 @@ function playMatch(score1, score2) {
     }
     startMatch(); // Start match (next)
 
+    // Reset saved scores
+    bufferScore1 = null;
+    bufferScore2 = null;
+
     return true;
 }
 
 /** Function performed if the button of playing match is clicked */
 function clickPlayButton(score1, score2) {
-
     const SCORES_VALID = !isNaN(score1) && !isNaN(score2);
     const SCORES_POSITIVE = score1 >= 0 && score2 >= 0;
 
@@ -281,15 +311,16 @@ function endMatchday(teamsArray) {
     placesAfterRounds.push(teamsArray);
 
     match = 0;
+
     matchday++;
+    displayedMatchday++;
     
     // End the game
     if (matchday >= matchdays) {
         endGame();
         return;
     }
-    createMatchesTable(matches); 
-    setRoundName(matchday + 1); 
+    createMatchesTable(matches, matchday); 
 }
 /** End the game */
 function endGame() {
@@ -353,4 +384,100 @@ function getColorsArray() {
         }
     }
     return colorsArray;
+}
+
+/** Display matchday */
+function displayMatchday(index) {
+    createMatchesTable(matches, index);
+    changeArrows(index);
+
+    setScoresSaveEvents();
+
+    // Set match scores if it's played
+    for(let i = 0; i < matchesPerMatchday; i++) {
+        let matchIndex = index * matchesPerMatchday + i;
+        let match = matches[matchIndex];
+        
+        if(match.score1 != -1 && match.score2 != -1) {
+            let matchElem = getMatchElem(i);
+            getScoreInput(matchElem, 0).value = match.score1;
+            getScoreInput(matchElem, 1).value = match.score2;
+        }
+    }
+    
+    // Enable match that's being played now
+    if(index == matchday) {
+        let matchElem = getMatchElem(match);
+        enableMatch(matchElem, true);
+
+        if(bufferScore1 != null) getScoreInput(matchElem, 0).value = bufferScore1;
+        if(bufferScore2 != null) getScoreInput(matchElem, 1).value = bufferScore2;
+
+        button.style.setProperty("display", "inline-block");
+        roundNameDiv.classList.add("active-round");
+    } else {
+        button.style.setProperty("display", "none");
+        roundNameDiv.classList.remove("active-round");
+    }
+}
+
+/** Create events for scores inputs that save scores after switching matchday */
+function setScoresSaveEvents() {
+    let matchElem = getMatchElem(match);
+    let input1 = getScoreInput(matchElem, 0);
+    let input2 = getScoreInput(matchElem, 1);
+
+    input1.onkeyup = function() {
+        bufferScore1 = input1.value;
+        if(isStringEmpty(bufferScore1)) {
+            bufferScore1 = null;
+        }
+    }
+    input2.onkeyup = function() {
+        bufferScore2 = input2.value;
+        if(isStringEmpty(bufferScore2)) {
+            bufferScore2 = null;
+        }
+    }
+}
+
+/** Function that enables/disables a match */
+function enableMatch(matchElem, enabled) {
+    let input1 = getScoreInput(matchElem, 0);
+    let input2 = getScoreInput(matchElem, 1);
+    
+    if(enabled) {
+        input1.removeAttribute("disabled");
+        input2.removeAttribute("disabled");
+        matchElem.style.backgroundColor = ACTIVE_MATCH_COLOR;
+    } else {
+        input1.setAttribute("disabled", "");
+        input2.setAttribute("disabled", "");
+        matchElem.style.backgroundColor = DEFAULT_MATCH_COLOR;
+    }
+}
+/** Function that gets an HTML object of a match */
+function getMatchElem(matchIndex) {
+    return document.querySelectorAll(`#${MATCHES_TABLE_ID} tr`)[matchIndex];
+}
+/** Function that gets one of two score inputs of a match */
+function getScoreInput(matchElem, inputIndex) {
+    return matchElem.querySelector(`#text${inputIndex + 1}`);
+}
+
+/** Function that changes arrow buttons during switching matchdays */
+function changeArrows(matchday) {
+    showArrow(leftArrow, true);
+    showArrow(rightArrow, true);
+    
+    if(matchday == 0) {
+        showArrow(leftArrow, false);
+    }
+    if(matchday >= matchdays - 1) {
+        showArrow(rightArrow, false);
+    }
+}
+/** Show/hide an arrow button */
+function showArrow(arrow, shown) {
+    arrow.style.setProperty("visibility", shown ? "visible" : "hidden");
 }

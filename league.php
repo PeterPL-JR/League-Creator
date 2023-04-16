@@ -96,8 +96,12 @@ if(isset($_POST['script'])) {
     <div id="table-div"></div>
     
     <!-- Matches table -->
-    <div id="round">Runda 1</div>
-    <div id="matches-div"></div>
+    <div id="round" class='active-round'>Runda 1</div>
+    <div id="matches-div">
+        <img class='arrow-button' src="images/arrow.png" id='left-arrow'>
+        <div id="matches-table-div"></div>
+        <img class='arrow-button' src="images/arrow.png" id='right-arrow'>
+    </div>
     
     <button id="button">Zagraj</button>
 </div>

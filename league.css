@@ -15,6 +15,10 @@ button, input {
     background-color: var(--back-color);
     color: var(--fore-color);
 }
+input {
+    text-align: center;
+    border-radius: 3px;
+}
 
 /* INIT DIV */
 input#teams-amount, input#league-name {
@@ -24,9 +28,8 @@ input#teams-amount, input#league-name {
     height: 36px;
     line-height: 36px;
 
-    padding: 3px;
     border: solid var(--fore-color) 1px;
-    border-radius: 2px;
+    padding: 3px;
 }
 input#rounds-amount {
     width: 200px;
@@ -152,10 +155,19 @@ input#league-name {
     padding-right: 10px;
 }
 
+#matches-div {
+    user-select: none;
+}
+#matches-div::selection, #matches-div *::selection {
+    background-color: #0000;
+}
+
 /* MATCHES TABLE */
 #matches-table {
+    display: inline-block;
     border-collapse: collapse;
     margin: auto;
+    vertical-align: middle;
 }
 
 #matches-table td {
@@ -178,23 +190,28 @@ input#league-name {
     font-size: 35px;
 }
 
+#matches-table-div {
+    display: inline-block;
+}
+
 input::-webkit-inner-spin-button, input::-webkit-outer-spin-button {
     -webkit-appearance: none;
 }
-input[type="number"] {
-    appearance: textfield;
-}
 
-input[type="number"] {
+input.score-input {
+    appearance: textfield;
+    
     width: 20px;
     padding: 3px;
     font: normal 23px 'Verdana';
     text-align: center;
-}
-input:disabled {
-    background-color: var(--back-color);
-    border: solid var(--fore-color-2) 1px;
+
+    outline: solid var(--fore-color-2) 2px;
     border-radius: 3px;
+    border: none;
+}
+input.score-input:disabled {
+    outline-width: 1px;
 }
 
 #matches-table td:first-child {
@@ -227,7 +244,10 @@ button:hover {
 
 #round {
     font: normal 30px 'Verdana';
-    margin-bottom: 5px;
+    margin: 10px;
+}
+#round.active-round {
+    font-weight: bold !important;
 }
 
 .color-input {
@@ -254,4 +274,24 @@ img#settings {
     border-radius: 50%;
     filter: invert(45%);
     cursor: pointer;
+}
+
+/* Arrow button */
+.arrow-button {
+    height: 40px;
+    display: inline-block;
+    
+    margin-left: 20px;
+    margin-right: 20px;
+    
+    filter: invert(15%);
+    cursor: pointer;
+    vertical-align: middle;
+}
+#left-arrow {
+    transform: scaleX(-1);
+    visibility: hidden;
+}
+#right-arrow {
+    visibility: visible;
 }
