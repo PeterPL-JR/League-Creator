@@ -88,6 +88,7 @@ if(isset($_POST['script'])) {
         <input type="number" id="rounds-amount" min=1 max=2 value="1"><br>
     </div>
     <div id="inputs-div"></div>
+    <button id="start-button" style="display: none;">Zacznij</button>
 </div>
 
 <!-- Container of the game -->

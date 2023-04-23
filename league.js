@@ -14,6 +14,8 @@ let displayedMatchday = 0;
 let bufferScore1 = null;
 let bufferScore2 = null;
 
+let end = false;
+
 /** Init the game */
 function init() {
     // Init teams/matches data
@@ -284,6 +286,9 @@ function playMatch(score1, score2) {
     // End the matchday
     if (match >= matchesPerMatchday) {
         endMatchday(sorted);
+        if(end) {
+            return false;
+        }
     }
     startMatch(); // Start match (next)
 
@@ -311,20 +316,23 @@ function endMatchday(teamsArray) {
     placesAfterRounds.push(teamsArray);
 
     match = 0;
-
-    matchday++;
-    displayedMatchday++;
-    
     // End the game
-    if (matchday >= matchdays) {
+    if (matchday >= matchdays - 1) {
         endGame();
         return;
     }
+    
+    matchday++;
+    displayedMatchday++;
+
     createMatchesTable(matches, matchday); 
 }
 /** End the game */
 function endGame() {
+    end = true;
     roundsTable();
+
+    roundNameDiv.classList.remove("active-round");
     button.remove();
 }
 
@@ -406,7 +414,7 @@ function displayMatchday(index) {
     }
     
     // Enable match that's being played now
-    if(index == matchday) {
+    if(!end && index == matchday) {
         let matchElem = getMatchElem(match);
         enableMatch(matchElem, true);
 

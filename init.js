@@ -15,6 +15,8 @@ let placesAfterRounds = []; // Teams places in table after each matchday
 let colors = {}; // Colors of each row of table
 
 let saveButton = getId("save-amount");
+let startButton = getId("start-button");
+
 let initDiv = getId("init-container");
 let gameDiv = getId("game-container");
 
@@ -47,13 +49,10 @@ function initSettingsPage() {
     colorsDiv.style.display = "inline-block";
     getId("default-color").value = teamsAmount;
     
-    // Init Start Button
-    let button = document.createElement("button");
-    button.innerHTML = "Zacznij";
-    button.id = "start-button";
-    
-    button.onclick = clickStartButton;
-    initDiv.appendChild(button);
+    // Init start button
+    startButton.style.display = "inline-block";
+    startButton.onclick = clickStartButton;
+
     saveButton.remove();
     
     // Init teams inputs
