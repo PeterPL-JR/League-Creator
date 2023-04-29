@@ -11,9 +11,9 @@ body {
     display: none;
 }
 
-button, input {
-    background-color: var(--back-color);
-    color: var(--fore-color);
+button, input, select {
+    background-color: var(--back-color) !important;
+    color: var(--fore-color) !important;
 }
 input {
     text-align: center;
@@ -49,6 +49,16 @@ input#teams-amount:read-only, input#league-name:read-only {
 
 input#league-name {
     font-size: 26px;
+}
+
+select#teams-mode-select {
+    font-size: 25px;
+    width: 350px;
+    height: 40px;
+    text-align: center;
+}
+select[readonly] {
+    pointer-events: none;
 }
 
 #inputs-div {
@@ -294,4 +304,8 @@ img#settings {
 }
 #right-arrow {
     visibility: visible;
+}
+
+.header {
+    font-size: 23px;
 }

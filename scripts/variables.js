@@ -3,6 +3,10 @@ const GET_TEAMS_SCRIPT = 0;
 const CHECK_TEAM_SCRIPT = 1;
 const GET_ALL_TEAMS = 2;
 
+const TEAMS_MODE_NATIONAL = 0;
+const TEAMS_MODE_CLUBS = 1;
+const TEAMS_MODE_CUSTOM = 2;
+
 // PHP / SRC
 const LEAGUE_PHP_FILE = "league.php";
 const QUALIFICATION_PHP_FILE = "qualification.php";

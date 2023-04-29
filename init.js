@@ -4,6 +4,7 @@ let matches = []; // [Matches] array
 let leagueName; // Tournament name
 let teamsAmount; // Teams participating in the tournament
 let roundsAmount; // Rounds (First match/rematch)
+let teamsMode; // National teams/clubs/custom teams
 
 let matchdays; // Matchdays
 let matchesPerMatchday; // Amout of matches per matchday
@@ -77,7 +78,7 @@ function initTeamsInputs() {
         input.className = "init-team-div";
         input.placeholder = "Drużyna " + (i + 1);
 
-        input.setAttribute("onkeyup", `checkTeamFromInput(${i});`);
+        input.setAttribute("onkeyup", `checkTeamFromInput(${i}, ${teamsMode});`);
         inputsDiv.appendChild(input);
 
         // Div of team validity
@@ -95,10 +96,12 @@ function initTeamsInputs() {
 function clickMenuButton() {
     let leagueNameInput = getId("league-name");
     let teamsAmountInput = getId("teams-amount");
+    let teamsModeSelect = getId("teams-mode-select");
     
     let leagueNameBuffer = leagueNameInput.value;
     let teamsAmountBuffer = parseInt(teamsAmountInput.value);
-    
+    teamsMode = teamsModeSelect.selectedIndex;
+
     // Set default tournament name if it's empty
     if(isStringEmpty(leagueNameBuffer)) {
         leagueNameBuffer = leagueNameInput.getAttribute("placeholder");
@@ -114,7 +117,10 @@ function clickMenuButton() {
         
         // Modify Teams-Amount Input
         teamsAmountInput.setAttribute("readonly", "true");
-        
+
+        // Modify Teams-Mode Selection
+        teamsModeSelect.setAttribute("readonly", "true");
+
         initSettingsPage();
     }
 }
@@ -142,16 +148,18 @@ function clickStartButton() {
 
     // Check teams in DB
     const teamsArrayString = JSON.stringify(teamsBuffer1);
-    serverPost(LEAGUE_PHP_FILE, { script: GET_TEAMS_SCRIPT, data: teamsArrayString }, function (responceText) {
-        let teamsBuffer2 = checkTeams(JSON.parse(responceText), teamsBuffer1);
+    serverPost(LEAGUE_PHP_FILE, { script: GET_TEAMS_SCRIPT, data: teamsArrayString, mode: teamsMode }, function (responceText) {
+        let teamsBuffer2 = checkTeams(JSON.parse(responceText), teamsBuffer1, teamsMode);
 
         // Check all data
-        checkUserData(teamsBuffer2, roundsAmountBuffer, colorsBuffer);
+        if(teamsBuffer2) {
+            checkUserData(teamsBuffer2, roundsAmountBuffer, colorsBuffer);
+        }
     });
 }
 
 /** Check validify of teams entered by user in settings page */
-function checkTeams(serverTeams, teamsNamesArray) {
+function checkTeams(serverTeams, teamsNamesArray, teamsMode) {
     const MIN_ID = 1_000_000;
     const MAX_ID = 9_999_999;
 
@@ -159,9 +167,12 @@ function checkTeams(serverTeams, teamsNamesArray) {
 
     for (let teamName of teamsNamesArray) {
         let teamObj = findTeamByName(serverTeams, teamName.toLowerCase(), false);
+        if(teamObj == null && teamsMode != TEAMS_MODE_CUSTOM) {
+            return null;
+        }
 
         // Create custom team object
-        if(teamObj == null) {
+        if(teamObj == null || teamsMode == TEAMS_MODE_CUSTOM) {
             let id = getRandom(MIN_ID, MAX_ID);
             let name = teamName;
             teamObj = {name, id};
@@ -217,13 +228,15 @@ function getColor(colorName) {
 }
 
 /** Connect with DB and check if a team exists */
-function checkTeamFromInput(index) {
+function checkTeamFromInput(index, teamsMode) {
+    if(teamsMode == TEAMS_MODE_CUSTOM) return;
+
     let input = getClass("init-team-div")[index];
     let checkDiv = getClass("check-div")[index];
     
     let value = input.value;
 
-    serverPost(LEAGUE_PHP_FILE, { script: CHECK_TEAM_SCRIPT, data: value }, function(responceText) {
+    serverPost(LEAGUE_PHP_FILE, { script: CHECK_TEAM_SCRIPT, data: value, mode: teamsMode }, function(responceText) {
         let teamExists = JSON.parse(responceText);
         checkDiv.style.visibility = (teamExists) ? "visible" : "hidden";
     });

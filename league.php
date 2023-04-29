@@ -6,14 +6,17 @@ include_once 'php/functions.php';
 include_once 'php/variables.php';
 
 /** Function that gets data of a team from DB */
-function get_teams($teams_names_array) {
+function get_teams($teams_names_array, $mode) {
     global $base;
+
+    $QUERY_TEAMS = "SELECT team_id AS team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = ";
+    $QUERY_CLUBS = "SELECT str_id AS team_id, link, (CASE WHEN content IS NULL THEN clubs.name ELSE content END) AS content FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id JOIN teams ON teams.name = clubs.national_team_id HAVING content = ";
 
     $teams = [];
     $array = json_decode($teams_names_array);
 
     foreach($array as $team_name) {
-        $query = mysqli_query($base, "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = '$team_name';");
+        $query = mysqli_query($base, (($mode == TEAMS_MODE_NATIONAL) ? $QUERY_TEAMS : $QUERY_CLUBS)."'$team_name';");
         while ($row = mysqli_fetch_assoc($query)) {
             array_push($teams, get_team($row));
         }
@@ -21,10 +24,13 @@ function get_teams($teams_names_array) {
     echo json_encode($teams)."";
 }
 /** Function that checks if a team exists in DB */
-function check_team($team_name) {
+function check_team($team_name, $mode) {
     global $base;
-    
-    $query = mysqli_query($base, "SELECT COUNT(*) FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = '$team_name';");
+
+    $QUERY_TEAMS = "SELECT COUNT(*) FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = '$team_name';";
+    $QUERY_CLUBS = "SELECT COUNT(*) FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id WHERE (CASE WHEN lang_id IS NULL THEN TRUE ELSE lang_id = 1 END) AND (CASE WHEN content IS NULL THEN name ELSE content END) = '$team_name';";
+
+    $query = mysqli_query($base, ($mode == TEAMS_MODE_NATIONAL) ? $QUERY_TEAMS : $QUERY_CLUBS);
     $amount = mysqli_fetch_row($query)[0];
 
     echo json_encode($amount == 1 ? TRUE : FALSE);
@@ -37,10 +43,10 @@ if(isset($_POST['script'])) {
 
     // Perform functions
     if($script == GET_TEAMS_SCRIPT) {
-        get_teams($_POST['data']);
+        get_teams($_POST['data'], $_POST['mode']);
     }
     if($script == CHECK_TEAM_SCRIPT) {
-        check_team($_POST['data']);
+        check_team($_POST['data'], $_POST['mode']);
     }
 } else {
 ?>
@@ -65,11 +71,20 @@ if(isset($_POST['script'])) {
 <!-- Container of tournament settings -->
 <div id="init-container">
     <!-- Menu settings page -->
-    <div style="font-size: 23px;">Nazwa turnieju</div>
+    <div class='header'>Nazwa turnieju</div>
     <input type="text" id="league-name" placeholder="Turniej 1">
+    <br><br>
 
-    <div style="font-size: 23px;">Ilość drużyn</div>
+    <div class='header'>Ilość drużyn</div>
     <input type="number" id="teams-amount" value="4"><br>
+
+    <div class='header'>Drużyny</div>
+    <select id="teams-mode-select">
+        <option>Drużyny narodowe</option>
+        <option>Kluby</option>
+        <option>(Własne)</option>
+    </select>
+    <br><br>
 
     <button id="save-amount">Zapisz</button><br>
     
@@ -84,7 +99,7 @@ if(isset($_POST['script'])) {
         </div><br>
 
         <!-- Number of rounds settings -->
-        <div style="font-size: 23px;">Ilość Kolejek (1-2)</div>
+        <div class='header'>Ilość Kolejek (1-2)</div>
         <input type="number" id="rounds-amount" min=1 max=2 value="1"><br>
     </div>
     <div id="inputs-div"></div>
