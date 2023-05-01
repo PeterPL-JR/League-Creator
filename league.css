@@ -100,14 +100,34 @@ select[readonly] {
 #init-properties-div {
     display: none;
 }
-#colors-div input {
+
+.colors-div {
+    display: none;
+}
+.colors-div input {
     margin-bottom: 4px;
 }
-#colors-div div {
+.colors-div div {
     width: 30px;
     height: 30px;
     float: left;
     outline: solid var(--fore-color) 1px;
+}
+#colors-header *{
+    display: inline-block;
+}
+.colors-arrow {
+    font-weight: bold;
+    cursor: pointer;
+
+    margin-left: 5px;
+    margin-right: 5px;
+}
+.colors-arrow::selection {
+    background-color: #0000;
+}
+#colors-arrow-left {
+    visibility: hidden;
 }
 
 /* TEAMS TABLE */
@@ -163,6 +183,11 @@ select[readonly] {
 
     padding-left: 10px;
     padding-right: 10px;
+}
+
+img.medal {
+    width: 30px;
+    height: 30px;
 }
 
 #matches-div {
@@ -269,6 +294,10 @@ button:hover {
 /* STATISTICS */
 .places-table td {
     font: normal 25px 'Verdana' !important;
+    padding: 0px !important;
+}
+.places-table td:first-child {
+    padding: 3px !important;
 }
 
 /* Settings */

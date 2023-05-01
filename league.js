@@ -6,6 +6,12 @@ const button = getId("button");
 const leftArrow = getId("left-arrow");
 const rightArrow = getId("right-arrow");
 
+let MEDALS_AMOUNT = 3;
+
+const COLORS_NAMES = [];
+COLORS_NAMES[COLORS_MODE_LEAGUE] = ["green", "yellow", "default", "red"];
+COLORS_NAMES[COLORS_MODE_PLACES] = ["gold", "silver", "brown", "default"];
+
 let matchday = 0;
 let match = 0;
 
@@ -98,16 +104,15 @@ function createTeamsTable(teamsTable) {
 
     // Table rows
     for (let t = 0; t < teamsTable.length; t++) {
-        createTeamRow(table, teamsTable[t], t + 1);
+        createTeamRow(table, teamsTable[t], t);
     }
 
     // Colors
-    setColors([
-        [COLOR_GREEN, colors.green],
-        [COLOR_YELLOW, colors.yellow],
-        [COLOR_DEFAULT, colors.default],
-        [COLOR_RED, colors.red],
-    ]);
+    let colorsArray = [];
+    for(let key in colors) {
+        colorsArray.push([COLORS[key], colors[key]]);
+    }
+    setColors(colorsArray);
 }
 /** Generate matches table of a matchday */
 function createMatchesTable(matchesArray, matchday=0) {
@@ -131,13 +136,16 @@ function createMatchesTable(matchesArray, matchday=0) {
 
 /** Function that generates one row of a team (for teams table) */
 function createTeamRow(table, teamObj, rowIndex) {
+    let place = rowIndex + 1;
     // Team data
     let teamImage = getImageElement(teamObj.link);
     let teamName = teamObj.name;
 
     // HTML row element
+    let placeText = getPlaceElement(place);
+
     let tr = document.createElement("tr");
-    tr.innerHTML = `<td>${rowIndex}</td><td>${teamImage}<div>${teamName}</div></td>`;
+    tr.innerHTML = `<td>${placeText}</td><td>${teamImage}<div>${teamName}</div></td>`;
     table.appendChild(tr);
 
     // Team statistics
@@ -182,10 +190,13 @@ function createMatchRow(table, matchObj) {
 /** Get HTML image element if it's defined */
 function getImageElement(src) {
     let imageHTML = `<img src="${FLAGS_SRC}${src}">`;
-    if(!src) {
-        imageHTML = "";
-    }
-    return imageHTML;
+    return (src) ? imageHTML : "";
+}
+
+/** Get HTML of place of row (text or medal image) */
+function getPlaceElement(place) {
+    let medalText = `<img class='medal' src='images/place_${place}.png'>`;
+    return (colorsMode == COLORS_MODE_PLACES && place <= MEDALS_AMOUNT) ? medalText : place;
 }
 
 /** Display basic data and statistics of all teams in teams table */
@@ -372,26 +383,34 @@ function roundsTable() {
             });
 
             // Display the place after
-            const place = placeIndex + 1;
-            const placeText = (place == 1) ? `<b>${place}</b>` : place;
+            let place = placeIndex + 1;
+            let placeText = (p < placesAfterRounds.length - 1) ? place : getPlaceElement(placeIndex + 1);
+            if(place == 1) {
+                placeText = `<b>${placeText}</b>`;
+            }
             tr.innerHTML += `<td style='background-color: ${colorsArray[placeIndex]};'>${placeText}</td>`;
         }
     }
 }
 /** Get the colors of each place in teams table */
 function getColorsArray() {
-    const COLORS = [COLOR_GREEN, COLOR_YELLOW, COLOR_DEFAULT, COLOR_RED];
-    const COLORS_AMOUNTS = [colors.green, colors.yellow, colors.default, colors.red];
+    const colorsArray = [];
+    const colorsAmountsArray = [];
 
-    let colorsArray = [];
+    for(let key in colors) {
+        colorsArray.push(COLORS[key]);
+        colorsAmountsArray.push(colors[key]);
+    }
+
+    let finalArray = [];
     // All colors
-    for(let c = 0; c < COLORS_AMOUNTS.length; c++) {
+    for(let c = 0; c < colorsAmountsArray.length; c++) {
         // Occurrences of a color
-        for(let i = 0; i < COLORS_AMOUNTS[c]; i++) {
-            colorsArray.push(COLORS[c]);
+        for(let i = 0; i < colorsAmountsArray[c]; i++) {
+            finalArray.push(colorsArray[c]);
         }
     }
-    return colorsArray;
+    return finalArray;
 }
 
 /** Display matchday */

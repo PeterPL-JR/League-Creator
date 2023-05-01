@@ -6,6 +6,8 @@ let teamsAmount; // Teams participating in the tournament
 let roundsAmount; // Rounds (First match/rematch)
 let teamsMode; // National teams/clubs/custom teams
 
+let colorsMode = 0; // Mode of colors displayed on the table
+
 let matchdays; // Matchdays
 let matchesPerMatchday; // Amout of matches per matchday
 
@@ -21,26 +23,18 @@ let startButton = getId("start-button");
 let initDiv = getId("init-container");
 let gameDiv = getId("game-container");
 
+const COLORS_MODES = 2;
+let leftColorsArrow = getId("colors-arrow-left");
+let rightColorsArrow = getId("colors-arrow-right");
+
 /** Init menu settings page */
 function initMenuPage() {
     // Init colors settings divs
-    let colorsDivs = document.querySelectorAll("#colors-div div");
 
-    colorsDivs[0].style.backgroundColor = COLOR_GREEN;
-    colorsDivs[1].style.backgroundColor = COLOR_YELLOW;
-
-    colorsDivs[2].style.backgroundColor = COLOR_RED;
-    colorsDivs[3].style.backgroundColor = COLOR_DEFAULT;
+    initColors();
     
     // Button event that initializes the game
     saveButton.onclick = clickMenuButton;
-
-    // Events of colors settings divs
-    let colorsInputs = document.querySelectorAll("#colors-div input");
-    for(let colorInput of colorsInputs) {
-        // Change colors settings when input value is changed
-        colorInput.setAttribute("onchange", "editColors();"); 
-    }
 }
 
 /** Init settings page */
@@ -48,8 +42,13 @@ function initSettingsPage() {
     // Init colors div
     let colorsDiv = getId("init-properties-div");
     colorsDiv.style.display = "inline-block";
-    getId("default-color").value = teamsAmount;
+
+    let defaultColorDiv1 = document.querySelector("#colors-div-1 #default-color");
+    defaultColorDiv1.value = teamsAmount;
     
+    let defaultColorDiv2 = document.querySelector("#colors-div-2 #default-color");
+    defaultColorDiv2.value = teamsAmount - MEDALS_AMOUNT;
+
     // Init start button
     startButton.style.display = "inline-block";
     startButton.onclick = clickStartButton;
@@ -90,6 +89,27 @@ function initTeamsInputs() {
         // New line
         inputsDiv.appendChild(document.createElement("br"));
     }
+}
+
+/** Function that initializes panels for editing color */
+function initColors() {
+    initColorsPanel(0, COLORS_NAMES[COLORS_MODE_LEAGUE]);
+    initColorsPanel(1, COLORS_NAMES[COLORS_MODE_PLACES]);
+
+    leftColorsArrow.onclick = function() {
+        switchColorsPanel(-1);
+    }
+    rightColorsArrow.onclick = function() {
+        switchColorsPanel(1);
+    }
+
+    getId("gold-color").value = 1;
+    getId("silver-color").value = 1;
+    getId("brown-color").value = 1;
+
+    getId("gold-color").setAttribute("readonly", "");
+    getId("silver-color").setAttribute("readonly", "");
+    getId("brown-color").setAttribute("readonly", "");
 }
 
 /** Function performed if the button of menu settings page is clicked */
@@ -139,12 +159,7 @@ function clickStartButton() {
     }
 
     // Colors of rows
-    let colorsBuffer = {
-        green: getColor("green"),
-        yellow: getColor("yellow"),
-        default: getColor("default"),
-        red: getColor("red")
-    };
+    let colorsBuffer = getColorsFromInputs(colorsMode);
 
     // Check teams in DB
     const teamsArrayString = JSON.stringify(teamsBuffer1);
@@ -190,9 +205,8 @@ function checkUserData(teamsBuffer, roundsAmountBuffer, colorsBuffer) {
 
     const TEAMS_AMOUNT_VALID = teamsBuffer.length == teamsAmount;
     const ROUNDS_AMOUNT_VALID = roundsAmountBuffer == 1 || roundsAmountBuffer == 2;
-    const COLORS_VALID = colorsBuffer.green && colorsBuffer.yellow && colorsBuffer.red && colorsBuffer.default; 
 
-    if (TEAMS_AMOUNT_VALID && ROUNDS_AMOUNT_VALID && COLORS_VALID) {
+    if (TEAMS_AMOUNT_VALID && ROUNDS_AMOUNT_VALID) {
         roundsAmount = roundsAmountBuffer;
         teams = teamsBuffer;
         colors = colorsBuffer;
@@ -201,9 +215,56 @@ function checkUserData(teamsBuffer, roundsAmountBuffer, colorsBuffer) {
     }
 }
 
+/** Init panels for editing colors */
+function initColorsPanel(index, colorsArray) {
+    let container = document.getElementById("colors-div-" + (index + 1));
+    if(index == colorsMode) {
+        container.style.display = "block";
+    }
+    let defaultColorHTML = "";
+
+    for(let i = 0; i < colorsArray.length; i++) {
+        let colorName = colorsArray[i];
+        let color = COLORS[colorName];
+        let disabledText = (colorName == "default") ? "readonly" : "";
+
+        let colorHTML = `<div style='background-color: ${color};'></div><input ${disabledText} class='color-input' type='number' value='0' id='${colorName}-color' onchange='editColors(${index});'><br>`;
+
+        if(colorName == "default") {
+            defaultColorHTML = colorHTML;
+            continue;
+        }
+        container.innerHTML += colorHTML;
+    }
+    container.innerHTML += defaultColorHTML;
+}
+
+/** Switch colors panel */
+function switchColorsPanel(direction) {
+    colorsMode += direction;
+
+    leftColorsArrow.style.visibility = "visible";
+    rightColorsArrow.style.visibility = "visible";
+
+    if(colorsMode <= 0) {
+        colorsMode = 0;
+        leftColorsArrow.style.visibility = "hidden";
+    }
+
+    if(colorsMode >= COLORS_MODES - 1) {
+        colorsMode = COLORS_MODES - 1;
+        rightColorsArrow.style.visibility = "hidden";
+    }
+
+    let colorsDivs = document.getElementsByClassName("colors-div");
+    for(let i = 0; i < COLORS_MODES; i++) {
+        colorsDivs[i].style.display = (i == colorsMode) ? "block" : "none";
+    }
+}
+
 /** Function performed if value of any color input is changed */
-function editColors() {
-    let colorsInputs = document.querySelectorAll("#colors-div input:not([id='default-color'])");
+function editColors(index) {
+    let colorsInputs = document.querySelectorAll(`#colors-div-${index + 1} input:not([id='default-color'])`);
     let sum = 0;
 
     // Sum of colored table rows
@@ -219,12 +280,21 @@ function editColors() {
     let emptyRows = teamsAmount - sum;
     if(emptyRows < 0) emptyRows = 0;
 
-    document.querySelector(`#colors-div input#default-color`).value = emptyRows;
+    document.querySelector(`#colors-div-${index + 1} input#default-color`).value = emptyRows;
 }
 
-/** Get number of rows colored by given color */
-function getColor(colorName) {
-    return getId(colorName + "-color").value;
+/** Get number of rows colored by a color */
+function getColor(panelIndex, colorName) {
+    return document.querySelector(`#colors-div-${panelIndex + 1} #${colorName}-color`).value;
+}
+function getColorsFromInputs(colorsMode) {
+    let colorsNames = COLORS_NAMES[colorsMode];
+    let array = [];
+
+    for(let colorName of colorsNames) {
+        array[colorName] = getColor(colorsMode, colorName);
+    }
+    return array;
 }
 
 /** Connect with DB and check if a team exists */

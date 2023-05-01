@@ -91,13 +91,18 @@ if(isset($_POST['script'])) {
     <!-- Settings page -->
     <div id="init-properties-div">
         <!-- Colors settings -->
-        <div id="colors-div">
-            <div></div><input class='color-input' type="number" value="0" id="green-color"><br>
-            <div></div><input class='color-input' type="number" value="0" id="yellow-color"><br>
-            <div></div><input class='color-input' type="number" value="0" id="red-color"><br>
-            <div></div><input readonly class='color-input' type="number" value="0" id="default-color"><br>
-        </div><br>
+        <div class="header" id='colors-header'>
+            <div class='colors-arrow' id='colors-arrow-left'><</div>
+            <div>Kolory</div>
+            <div class='colors-arrow' id='colors-arrow-right'>></div>
+        </div>
+        
+        <div style='clear: both;'></div>
 
+        <div id="colors-div-1" class='colors-div'></div>
+        <div id="colors-div-2" class='colors-div'></div>
+        <br>
+        
         <!-- Number of rounds settings -->
         <div class='header'>Ilość Kolejek (1-2)</div>
         <input type="number" id="rounds-amount" min=1 max=2 value="1"><br>
