@@ -7,6 +7,16 @@ body {
     --height: 30px;
 }
 
+h1#logo {
+    background-color: var(--back-color-2);
+    font: bold 50px 'Verdana';
+    border: solid var(--border-color) 7px;
+    padding: 5px;
+    
+    width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+}
 #game-container {
     display: none;
 }
@@ -64,6 +74,9 @@ select[readonly] {
 #inputs-div {
     width: max-content;
     margin: auto;
+}
+#inputs-div input {
+    width: 340px;
 }
 #inputs-div br {
     clear: both;

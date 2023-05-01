@@ -68,12 +68,14 @@ if(isset($_POST['script'])) {
 <body onload="initMenuPage(); initTheme();">
 <img src="images/user.png" id='settings'>
 
+<h1 id="logo">League Creator</h1>
+
 <!-- Container of tournament settings -->
 <div id="init-container">
     <!-- Menu settings page -->
     <div class='header'>Nazwa turnieju</div>
     <input type="text" id="league-name" placeholder="Turniej 1">
-    <br><br>
+    <br><br><br>
 
     <div class='header'>Ilość drużyn</div>
     <input type="number" id="teams-amount" value="4"><br>

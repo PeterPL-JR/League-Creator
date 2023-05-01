@@ -20,6 +20,7 @@ let colors = {}; // Colors of each row of table
 let saveButton = getId("save-amount");
 let startButton = getId("start-button");
 
+let logo = getId("logo");
 let initDiv = getId("init-container");
 let gameDiv = getId("game-container");
 
@@ -61,6 +62,7 @@ function initSettingsPage() {
 
 /** Init main page of the game */
 function initGamePage() {
+    logo.style.display = "none";
     initDiv.style.display = "none"
     gameDiv.style.display = "block";
 
