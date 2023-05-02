@@ -46,4 +46,8 @@ const COLORS_MODE_PLACES = 1;
 
 // IDs/Classes
 const TEAMS_TABLE_CLASS = "teams-table";
-const MATCHES_TABLE_ID = "matches-table";
+const MATCHES_TABLE_CLASS = "matches-table";
+
+// Directions
+const DIRECTION_LEFT = 0;
+const DIRECTION_RIGHT = 1;

@@ -127,6 +127,8 @@ if(isset($_POST['script'])) {
     </div>
     
     <button id="button">Zagraj</button>
+
+    <div id='team-matches-table-div'></div>
 </div>
     <script src="init.js"></script>
     <script src="league.js"></script>

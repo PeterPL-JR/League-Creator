@@ -33,3 +33,15 @@ function findTeamBy(teamsArray, key, value) {
     }
     return null;
 }
+
+/** Count matches played of a team */
+function countMatchesPlayed(teamId, matchesArray) {
+    let matchesPlayed = 0;
+
+    for(let match of matchesArray) {
+        if((match.team1 == teamId || match.team2 == teamId) && match.score1 != -1 && match.score2 != -1) {
+            matchesPlayed++;
+        }
+    }
+    return matchesPlayed;
+}
