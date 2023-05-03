@@ -98,6 +98,10 @@ function createTeamsTable(teamsTable) {
     tableDiv.innerHTML = "";
     tableDiv.appendChild(table);
 
+    table.oncontextmenu = function() {
+        return false;
+    }
+
     // Table header
     const STATS_NAMES = ["M", "Drużyna", "Pkt", "+", "-", "+/-", "W", "R", "P", "M"];
     let header = document.createElement("tr");
@@ -349,6 +353,8 @@ function endGame() {
 
 /** Generate a table that shows list of all matches of a team */
 function displayMatches(teamId, rowIndex) {
+    if(window.event.button != RIGHT_BUTTON) return;
+
     teamMatchesDiv.innerHTML = "";
 
     if(displayedMatchesTeam == teamId) {
@@ -574,7 +580,7 @@ function setArrowSpanVisible(rowIndex, visible) {
 
 /** Function that gets text of table row of team information (teams table/matches table) */
 function getTeamText(teamObj, teamImage, rowIndex) {
-    return `${teamImage}<div class='team-name' onclick='displayMatches("${teamObj.id}", ${rowIndex});'>${teamObj.name}<span>V</span></div>`;
+    return `${teamImage}<div class='team-name' onmousedown='displayMatches("${teamObj.id}", ${rowIndex});'>${teamObj.name}<span>V</span></div>`;
 }
 function getMatchTeamText(teamImage, teamName, direction, bold) {
     let imageText = teamImage;

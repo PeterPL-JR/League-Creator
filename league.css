@@ -210,9 +210,6 @@ img.medal {
     margin-left: 5px;
     visibility: hidden;
 }
-.team-name::selection, .team-name *::selection {
-    background-color: #0000;
-}
 
 #matches-div {
     user-select: none;
