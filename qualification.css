@@ -77,6 +77,17 @@ input {
     position: relative;
 }
 
+.group-table {
+    width: 140px !important;
+}
+.group-table tr {
+    font-size: 20px !important;
+    height: max-content;
+}
+.group-table tr:not(:first-child) {
+    height: 22px;
+}
+
 #input-div {
     width: max-content;
     display: inline-block;
@@ -94,6 +105,9 @@ div#teams-amount {
 
     margin-top: -4px;
     margin-left: 8px;
+}
+div#total-teams-amount {
+    display: inline;
 }
 
 .team-elem {
@@ -148,6 +162,11 @@ select {
 
 #pots-inputs-div input {
     width: 300px;
+}
+select#teams-mode-select {
+    width: 300px;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 #button-draw-start {
     display: none;

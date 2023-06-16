@@ -5,7 +5,7 @@ include_once 'database.php';
 include_once 'php/functions.php';
 include_once 'php/variables.php';
 
-define("TEAMS_QUERY", "SELECT team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id");
+define("TEAMS_QUERY", "SELECT team_id, link, content, con_id FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id");
 
 function get_teams($confed, $team_text) {
     get_from_db("WHERE confederations.name = '$confed' AND content LIKE '$team_text%' ORDER BY content;");
@@ -63,11 +63,21 @@ if(isset($_POST['script'])) {
 
             <h2>Grupy</h2>
             <input type="number" id='groups-amount-input' value="9">
+            <br>
 
+            <select id="teams-mode-select">
+                <option>Drużyny narodowe</option>
+                <option>Kluby</option>
+                <option>(Własne)</option>
+            </select>
+
+            <br><button id='button-save'>Zapisz</button>
             <br><button id='button-draw-start'>Losuj</button>
         </div>    
 
+        <div id="groups"></div>
         <div id="pots"></div>
+
         <div id="container">
             <div id="input-div">
                 <h2>
@@ -84,6 +94,7 @@ if(isset($_POST['script'])) {
 
                         ?>
                     </select>
+                    <div id="total-teams-amount"></div>
                 </h2>
                 <input type="text" id="teams-input">
                 <div id="teams-amount"></div>
