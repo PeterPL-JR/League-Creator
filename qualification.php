@@ -14,6 +14,15 @@ function get_all_teams() {
     get_from_db();
 }
 
+function get_confeds() {
+    global $base;
+
+    $get_confeds = mysqli_query($base, "SELECT name FROM confederations;");
+    while($row = mysqli_fetch_row($get_confeds)) {
+        echo "<option>".$row[0]."</option>";
+    }
+}
+
 function get_from_db($where_clauses="") {
     global $base;
 
@@ -79,26 +88,23 @@ if(isset($_POST['script'])) {
         <div id="pots"></div>
 
         <div id="container">
-            <div id="input-div">
-                <h2>
-                    Drużyny
-                    <select id='confed-select'>
-                        <?php
-
-                        include_once 'database.php';
-
-                        $get_confeds = mysqli_query($base, "SELECT name FROM confederations;");
-                        while($row = mysqli_fetch_row($get_confeds)) {
-                            echo "<option>".$row[0]."</option>";
-                        }
-
-                        ?>
-                    </select>
-                    <div id="total-teams-amount"></div>
-                </h2>
-                <input type="text" id="teams-input">
-                <div id="teams-amount"></div>
+            <h2>
+                Drużyny
+                <select id='confed-select'>
+                    <?php get_confeds(); ?>
+                </select>
+            </h2>
+            <input type="text" id="teams-input">
+            
+            <!-- Clubs content -->
+            <div id="clubs-div">
+                <h2>Kraj</h2>
+                <input type="text" id="country-input">
             </div>
+            
+            <!-- Custom teams content -->
+            <br><button id="button-add" style="display: none;">Dodaj</button>
+
             <div id="teams"></div>
         </div>
     </div>

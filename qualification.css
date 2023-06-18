@@ -93,7 +93,7 @@ input {
     display: inline-block;
 }
 
-#teams-input {
+#container input[type="text"] {
     width: 300px;
     padding: 2px;
     font-size: 20px;

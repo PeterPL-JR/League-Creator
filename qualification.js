@@ -12,14 +12,14 @@ const potsDiv = getId("pots");
 const groupsDiv = getId("groups");
 
 const teamsInput = getId("teams-input");
-const teamsDiv = getId("teams");
 const confedSelect = getId("confed-select");
-const teamsModeSelect = getId("teams-mode-select");
-const teamsAmountDiv = getId("teams-amount");
-const totalTeamsAmountDiv = getId("total-teams-amount");
+const teamsDiv = getId("teams");
+const countryInput = getId("country-input");
+const buttonAdd = getId("button-add");
 
 const teamsAmountInput = getId("teams-amount-input");
 const groupsAmountInput = getId("groups-amount-input");
+const teamsModeSelect = getId("teams-mode-select");
 
 const buttonSave = getId("button-save");
 const buttonDrawStart = getId("button-draw-start");
@@ -42,16 +42,16 @@ const imagesObjs = {};
 
 function initMenu() {
     buttonSave.onclick = save;
-
+    
     teamsAmountInput.onchange = changeInput;
     groupsAmountInput.onchange = changeInput;
+    changeTeamsModeInput();
 
     teamsInput.onkeyup = createTeamsElements;
+    countryInput.onkeyup = createTeamsElements;
 
-    confedSelect.onchange = function() {
-        teamsInput.value = "";
-        createTeamsElements();
-    }
+    teamsModeSelect.onchange = changeTeamsModeInput;
+
     potsDiv.oncontextmenu = function() {
         return false;
     }
@@ -144,6 +144,21 @@ function changeInput() {
     _groups = groupsAmount;
 
     createGroupsTables();
+}
+function changeTeamsModeInput() {
+    teamsMode = teamsModeSelect.selectedIndex;
+ 
+    // Custom mode
+    if(teamsMode == TEAMS_MODE_CUSTOM) {
+        confedSelect.style.display = "none";
+        buttonAdd.style.display = "inline-block";
+    } else {
+        confedSelect.style.display = "inline-block";
+        buttonAdd.style.display = "none";
+    }
+
+    // Clubs mode
+    getId("clubs-div").style.display = (teamsMode == TEAMS_MODE_CLUBS) ? "block" : "none";
 }
 
 function createTable(title, rowsNumber) {
@@ -248,10 +263,11 @@ function createTeamDiv(team) {
     const div = document.createElement("div");
     const id = team.id;
 
-    div.className = "team-elem";
-    div.innerHTML = `<div>${team.name}</div>`;
-    div.prepend(imagesObjs[team.id]);
     div.id = `team-div-${id}`;
+    div.innerHTML = `<div>${team.name}</div>`;
+    div.className = "team-elem";
+
+    div.prepend(imagesObjs[team.id]);
 
     div.setAttribute("onmousedown", `updateTeam('${id}')`);
     teamsDiv.appendChild(div);
