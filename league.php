@@ -9,8 +9,8 @@ include_once 'php/variables.php';
 function get_teams($teams_names_array, $mode) {
     global $base;
 
-    $QUERY_TEAMS = "SELECT team_id AS team_id, link, content FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = ";
-    $QUERY_CLUBS = "SELECT str_id AS team_id, link, (CASE WHEN content IS NULL THEN clubs.name ELSE content END) AS content FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id JOIN teams ON teams.name = clubs.national_team_id HAVING content = ";
+    $QUERY_TEAMS = "SELECT team_id AS team_id, link, content, con_id FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = ";
+    $QUERY_CLUBS = "SELECT str_id AS team_id, link, (CASE WHEN content IS NULL THEN clubs.name ELSE content END) AS content, con_id FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id JOIN teams ON teams.name = clubs.national_team_id HAVING content = ";
 
     $teams = [];
     $array = json_decode($teams_names_array);

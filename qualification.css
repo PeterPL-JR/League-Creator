@@ -62,8 +62,14 @@ input {
 }
 .teams-table div {
     position: absolute;
+    left: 5px;
     margin: 0px;
-    left: 40px;
+    text-align: left;
+
+    width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .teams-table tr:first-child {
     font-size: 25px;
@@ -75,6 +81,10 @@ input {
     display: block;
     border-bottom: none;
     position: relative;
+}
+
+.pre-team-row div {
+    left: 40px !important;
 }
 
 .group-table {
@@ -113,11 +123,9 @@ div#total-teams-amount {
 .team-elem {
     position: relative;
     width: 280px;
-    height: 60px;
+    height: 55px;
     float: left;
-
-    font-size: 25px;
-    line-height: 60px;
+    line-height: 55px;
 
     border: solid var(--border-color) 1px;
     margin: 5px;
@@ -128,21 +136,33 @@ div#total-teams-amount {
     position: absolute;
     left: 5px;
     height: 70%;
-
+    
     top: 0px;
     bottom: 0px;
-
+    
     margin: auto;
 }
 .team-elem div {
     position: absolute;
-    left: 76px;
+    font-size: 25px;
+    left: 5px;
+    height: 100%;
+    text-align: left;
+    white-space: nowrap;
 }
 .flying-elem {
     position: absolute;
     z-index: 3;
     visibility: visible !important;
     pointer-events: none;
+}
+
+.pre-team-elem {
+    height: 60px !important;
+    line-height: 60px !important;
+}
+.pre-team-elem div {
+    left: 76px !important;
 }
 
 .team-selected {

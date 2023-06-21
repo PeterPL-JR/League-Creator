@@ -1,7 +1,10 @@
 // PHP scripts
 const GET_TEAMS_SCRIPT = 0;
 const CHECK_TEAM_SCRIPT = 1;
-const GET_ALL_TEAMS = 2;
+const GET_NATIONAL_TEAMS = 4;
+const GET_CLUBS_TEAMS = 5;
+const GET_ALL_NATIONAL_TEAMS = 2;
+const GET_ALL_CLUBS_TEAMS = 3;
 
 const TEAMS_MODE_NATIONAL = 0;
 const TEAMS_MODE_CLUBS = 1;

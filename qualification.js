@@ -1,3 +1,6 @@
+let nationalTeams = [];
+let clubsTeams = [];
+
 let allPots = [];
 let allTeams = [];
 
@@ -45,12 +48,13 @@ function initMenu() {
     
     teamsAmountInput.onchange = changeInput;
     groupsAmountInput.onchange = changeInput;
-    changeTeamsModeInput();
+    changeTeamsModeSelect();
 
     teamsInput.onkeyup = createTeamsElements;
     countryInput.onkeyup = createTeamsElements;
 
-    teamsModeSelect.onchange = changeTeamsModeInput;
+    teamsModeSelect.onchange = changeTeamsModeSelect;
+    confedSelect.onchange = createTeamsElements;
 
     potsDiv.oncontextmenu = function() {
         return false;
@@ -61,16 +65,22 @@ function initMenu() {
 }
 
 function get() {
-    serverPost(QUALIFICATION_PHP_FILE, {script: GET_ALL_TEAMS}, function(responceText) {
-        allTeams = JSON.parse(responceText);
-        
-        for(let team of allTeams) {
+    // National teams
+    serverPost(QUALIFICATION_PHP_FILE, {script: GET_ALL_NATIONAL_TEAMS}, function(responceText) {
+        nationalTeams = JSON.parse(responceText);
+
+        for(let team of nationalTeams) {
             const img = document.createElement("img");
             img.src = FLAGS_SRC + team.link;
             img.setAttribute("draggable", "false");
             imagesObjs[team.id] = img;
         }
-        initMenu();
+
+        // Clubs teams
+        serverPost(QUALIFICATION_PHP_FILE, {script: GET_ALL_CLUBS_TEAMS}, function(responceText) {
+            clubsTeams = JSON.parse(responceText);
+            initMenu();
+        });
     });
 }
 get();
@@ -126,6 +136,9 @@ function save() {
     _groups = groupsAmount;
     _pots = potsAmount;
 
+    teamsInput.value="";
+    countryInput.value="";
+
     init();
 }
 function changeInput() {
@@ -145,9 +158,15 @@ function changeInput() {
 
     createGroupsTables();
 }
-function changeTeamsModeInput() {
+function changeTeamsModeSelect() {
     teamsMode = teamsModeSelect.selectedIndex;
- 
+
+    teamsInput.value="";
+    countryInput.value="";
+    confedSelect.selectedIndex = 0;
+
+    setTeamsArray();
+    
     // Custom mode
     if(teamsMode == TEAMS_MODE_CUSTOM) {
         confedSelect.style.display = "none";
@@ -159,6 +178,8 @@ function changeTeamsModeInput() {
 
     // Clubs mode
     getId("clubs-div").style.display = (teamsMode == TEAMS_MODE_CLUBS) ? "block" : "none";
+
+    createTeamsElements();
 }
 
 function createTable(title, rowsNumber) {
@@ -181,11 +202,31 @@ function setTableTeam(table, rowIndex, teamObject) {
 
     let row = table.querySelectorAll("tr")[rowIndex + 1];
     row.appendChild(div);
-    row.appendChild(imagesObjs[teamObject.id]);
+
+    if(isFlagsMode()) {
+        row.appendChild(getFlag(teamObject));
+        row.classList.add("pre-team-row");
+    }
 }
 
-function getTeams(confed, teamText, action) {
-    serverPost(QUALIFICATION_PHP_FILE, {script: GET_TEAMS_SCRIPT, confed, data: teamText}, function(responceText) {
+function setTeamsArray() {
+    if(teamsMode == TEAMS_MODE_NATIONAL) {
+        allTeams = nationalTeams;
+    }
+    if(teamsMode == TEAMS_MODE_CLUBS) {
+        allTeams = clubsTeams;
+    }
+    if(teamsMode == TEAMS_MODE_CUSTOM) {
+    }
+}
+
+function getNationalTeams(confed, teamText, action) {
+    serverPost(QUALIFICATION_PHP_FILE, {script: GET_NATIONAL_TEAMS, confed, data: teamText}, function(responceText) {
+        action(JSON.parse(responceText));
+    });
+}
+function getClubsTeams(confed, teamText, nationalTeamText, action) {
+    serverPost(QUALIFICATION_PHP_FILE, {script: GET_CLUBS_TEAMS, confed, data: teamText, national_team: nationalTeamText}, function(responceText) {
         action(JSON.parse(responceText));
     });
 }
@@ -234,29 +275,39 @@ function createTeamsElements() {
     const inputText = teamsInput.value;
     const confedSelected = confedSelect.value;
 
+    const countryText = countryInput.value;
+
+    if(teamsMode == TEAMS_MODE_NATIONAL) {
+        getNationalTeams(confedSelected, inputText, function(json) {
+            createTeamsDivs(json);
+        });
+    }
+    if(teamsMode == TEAMS_MODE_CLUBS) {
+        getClubsTeams(confedSelected, inputText, countryText, function(json) {
+            createTeamsDivs(json);
+        });
+    }
+}
+function createTeamsDivs(teamsArray) {
     const MAX_IN_ROW = 3;
 
-    getTeams(confedSelected, inputText, function(json) {
-        const teams = json;
+    teamsDiv.innerHTML="";
 
-        teamsDiv.innerHTML="";
+    const usedTeams = concatArray(potsTeams);
+    let teamsCounter = 0;
 
-        const usedTeams = concatArray(potsTeams);
-        let teamsCounter = 0;
-
-        for(let team of teams) {
-            const index = usedTeams.findIndex(function(elem) {
-                return elem == team.id;
-            });
-            if(index == -1) {
-                createTeamDiv(team);
-                teamsCounter++;
-            }
-            if(teamsCounter % MAX_IN_ROW == 0) {
-                createClearBoth(teamsDiv);
-            }
+    for(let team of teamsArray) {
+        const index = usedTeams.findIndex(function(elem) {
+            return elem == team.id;
+        });
+        if(index == -1) {
+            createTeamDiv(team);
+            teamsCounter++;
         }
-    });
+        if(teamsCounter % MAX_IN_ROW == 0) {
+            createClearBoth(teamsDiv);
+        }
+    }
 }
 
 function createTeamDiv(team) {
@@ -266,8 +317,12 @@ function createTeamDiv(team) {
     div.id = `team-div-${id}`;
     div.innerHTML = `<div>${team.name}</div>`;
     div.className = "team-elem";
+    div.setAttribute("title", team.name);
 
-    div.prepend(imagesObjs[team.id]);
+    if(isFlagsMode()) {
+        div.prepend(getFlag(team));
+        div.classList.add("pre-team-elem");
+    }
 
     div.setAttribute("onmousedown", `updateTeam('${id}')`);
     teamsDiv.appendChild(div);
@@ -290,11 +345,11 @@ function startMoving(id) {
     draggedTeam = id;
     
     const elem = getTeam(id);
-    elem.className = "team-elem team-selected";
+    elem.classList.add("team-selected");
     elem.style.visibility = "hidden";
     
     flyingElem = elem.cloneNode(elem);
-    flyingElem.className = "team-elem team-selected flying-elem";
+    flyingElem.classList.add("flying-elem");
     flyingElem.mouseItem = null;
     document.body.appendChild(flyingElem);
     
@@ -316,7 +371,7 @@ function stopMoving() {
     document.body.style.cursor = "default";
     const elem = getTeam(draggedTeam);
     if(elem != null) {
-        elem.className = "team-elem";
+        elem.classList.remove("team-selected");
         elem.style.visibility = "visible";
         flyingElem.remove();
     }
@@ -353,6 +408,15 @@ function mouseInPot(potIndex) {
 }
 function mouseOutPot(potIndex) {
     allPots[potIndex].querySelector("tr:first-child").className="";
+}
+
+function isFlagsMode() {
+    return teamsMode != TEAMS_MODE_CUSTOM;
+}
+function getFlag(teamObject) {
+    let nTeamId = (teamsMode == TEAMS_MODE_NATIONAL) ? "id" : "national_team_id";
+    let img = imagesObjs[teamObject[nTeamId]];
+    return img.cloneNode(true);
 }
 
 function choosePot(index) {

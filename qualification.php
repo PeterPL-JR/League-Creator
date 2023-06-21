@@ -5,13 +5,17 @@ include_once 'database.php';
 include_once 'php/functions.php';
 include_once 'php/variables.php';
 
-define("TEAMS_QUERY", "SELECT team_id, link, content, con_id FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id");
+define("NATIONAL_TEAMS_QUERY", "SELECT team_id, link, content, con_id FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id");
+define("CLUBS_TEAMS_QUERY", "SELECT str_id AS team_id, (CASE WHEN names_clubs.content IS NULL THEN clubs.name ELSE names_clubs.content END) AS content, national_team_id, con_id FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id JOIN teams ON teams.name = clubs.national_team_id JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id");
 
-function get_teams($confed, $team_text) {
-    get_from_db("WHERE confederations.name = '$confed' AND content LIKE '$team_text%' ORDER BY content;");
+function get_national_teams($confed, $team_text) {
+    get_from_db(TEAMS_MODE_NATIONAL, "WHERE confederations.name = '$confed' AND content LIKE '$team_text%' ORDER BY content;");
 }
-function get_all_teams() {
-    get_from_db();
+function get_clubs_teams($confed, $team_text, $national_team_text) {
+    get_from_db(TEAMS_MODE_CLUBS, "WHERE confederations.name = '$confed' AND names_teams.content LIKE '$national_team_text%' HAVING content LIKE '$team_text%' ORDER BY names_teams.content, content;");
+}
+function get_all_teams($teams_mode) {
+    get_from_db($teams_mode);
 }
 
 function get_confeds() {
@@ -23,14 +27,25 @@ function get_confeds() {
     }
 }
 
-function get_from_db($where_clauses="") {
+function get_from_db($teams_mode, $where_clauses="") {
     global $base;
+    if($teams_mode == TEAMS_MODE_NATIONAL) {
+        $query_text = NATIONAL_TEAMS_QUERY;
+    }
+    if($teams_mode == TEAMS_MODE_CLUBS) {
+        $query_text = CLUBS_TEAMS_QUERY;
+    }
 
     $teams = [];
-    $query = mysqli_query($base, TEAMS_QUERY." ".$where_clauses);
+    $query = mysqli_query($base, $query_text." ".$where_clauses);
 
     while($row = mysqli_fetch_assoc($query)) {
-        array_push($teams, get_team($row));
+        if($teams_mode == TEAMS_MODE_NATIONAL) {
+            array_push($teams, get_national_team($row));
+        }
+        if($teams_mode == TEAMS_MODE_CLUBS) {
+            array_push($teams, get_clubs_team($row));
+        }
     }
     echo json_encode($teams);
 }
@@ -40,11 +55,18 @@ if(isset($_POST['script'])) {
     $script = $_POST['script']; 
 
     // Perform functions
-    if($script == GET_TEAMS_SCRIPT) {
-        get_teams($_POST['confed'], $_POST['data']);
+    if($script == GET_NATIONAL_TEAMS) {
+        get_national_teams($_POST['confed'], $_POST['data']);
     }
-    if($script == GET_ALL_TEAMS) {
-        get_all_teams();
+    if($script == GET_CLUBS_TEAMS) {
+        get_clubs_teams($_POST['confed'], $_POST['data'], $_POST['national_team']);
+    }
+    
+    if($script == GET_ALL_NATIONAL_TEAMS) {
+        get_all_teams(TEAMS_MODE_NATIONAL);
+    }
+    if($script == GET_ALL_CLUBS_TEAMS) {
+        get_all_teams(TEAMS_MODE_CLUBS);
     }
 } else {
 ?>
