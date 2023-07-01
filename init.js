@@ -177,9 +177,6 @@ function clickStartButton() {
 
 /** Check validify of teams entered by user in settings page */
 function checkTeams(serverTeams, teamsNamesArray, teamsMode) {
-    const MIN_ID = 1_000_000;
-    const MAX_ID = 9_999_999;
-
     const teamsBuffer = [];
 
     for (let teamName of teamsNamesArray) {
@@ -190,7 +187,7 @@ function checkTeams(serverTeams, teamsNamesArray, teamsMode) {
 
         // Create custom team object
         if(teamObj == null || teamsMode == TEAMS_MODE_CUSTOM) {
-            let id = getRandom(MIN_ID, MAX_ID);
+            let id = getRandomID(teamsBuffer);
             let name = teamName;
             teamObj = {name, id};
         }

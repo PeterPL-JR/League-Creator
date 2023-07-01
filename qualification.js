@@ -1,5 +1,6 @@
 let nationalTeams = [];
 let clubsTeams = [];
+let customTeams = [];
 
 let allPots = [];
 let allTeams = [];
@@ -50,11 +51,13 @@ function initMenu() {
     groupsAmountInput.onchange = changeInput;
     changeTeamsModeSelect();
 
-    teamsInput.onkeyup = createTeamsElements;
+    teamsInput.onkeyup = changeTeamsInput;
     countryInput.onkeyup = createTeamsElements;
 
     teamsModeSelect.onchange = changeTeamsModeSelect;
     confedSelect.onchange = createTeamsElements;
+    
+    buttonAdd.onclick = addTeam;
 
     potsDiv.oncontextmenu = function() {
         return false;
@@ -148,7 +151,7 @@ function changeInput() {
     const MAX_TEAMS = allTeams.length;
     const DEFAULT_TEAMS = 54;
 
-    if(teamsAmount > MAX_TEAMS) {
+    if(teamsMode != TEAMS_MODE_CUSTOM && teamsAmount > MAX_TEAMS) {
         teamsAmountInput.value = DEFAULT_TEAMS;
         return;
     }
@@ -179,6 +182,13 @@ function changeTeamsModeSelect() {
     // Clubs mode
     getId("clubs-div").style.display = (teamsMode == TEAMS_MODE_CLUBS) ? "block" : "none";
 
+    createTeamsElements();
+}
+function changeTeamsInput() {
+    if(teamsMode == TEAMS_MODE_CUSTOM) {
+        let inputText = teamsInput.value;
+        buttonAdd.style.setProperty("display", findTeamByName(customTeams, inputText, false) != null ? "none" : "inline-block");
+    }
     createTeamsElements();
 }
 
@@ -217,6 +227,7 @@ function setTeamsArray() {
         allTeams = clubsTeams;
     }
     if(teamsMode == TEAMS_MODE_CUSTOM) {
+        allTeams = customTeams;
     }
 }
 
@@ -287,6 +298,15 @@ function createTeamsElements() {
             createTeamsDivs(json);
         });
     }
+    if(teamsMode == TEAMS_MODE_CUSTOM) {
+        let json = [];
+        for(let team of allTeams) {
+            if(team.name.indexOf(inputText) == 0) {
+                json.push(team);
+            }
+        }
+        createTeamsDivs(json);
+    }
 }
 function createTeamsDivs(teamsArray) {
     const MAX_IN_ROW = 3;
@@ -326,6 +346,17 @@ function createTeamDiv(team) {
 
     div.setAttribute("onmousedown", `updateTeam('${id}')`);
     teamsDiv.appendChild(div);
+}
+
+function addTeam() {
+    const inputText = teamsInput.value;
+    if(isStringEmpty(inputText)) return;
+
+    if(findTeamByName(customTeams, inputText, false) == null) {
+        customTeams.push({name: inputText, id: getRandomID()});
+        teamsInput.value = "";
+        createTeamsElements();
+    }
 }
 
 function updateMouse(event) {

@@ -45,3 +45,18 @@ function countMatchesPlayed(teamId, matchesArray) {
     }
     return matchesPlayed;
 }
+
+/** Get unique random ID for a custom team */
+function getRandomID(teamsArray=[]) {
+    const MIN_ID = 1_000_000;
+    const MAX_ID = 9_999_999;
+
+    let randomId = getRandom(MIN_ID, MAX_ID);
+    let teamIndex = teamsArray.findIndex(function(team) {
+        return team.id == randomId;
+    });
+    if(teamIndex != -1) {
+        return getRandomID(teamsArray);
+    }
+    return randomId;
+}
