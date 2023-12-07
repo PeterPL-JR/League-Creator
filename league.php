@@ -10,8 +10,8 @@ function get_teams($teams_names_array, $mode, $icons_mode=CLUBS_MODE_FLAGS) {
     global $base;
     $link = ($mode == TEAMS_MODE_CLUBS && $icons_mode == CLUBS_MODE_LOGOS) ? "logo_src" : "link";
 
-    $QUERY_TEAMS = "SELECT team_id AS team_id, link, content, con_id FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = ";
-    $QUERY_CLUBS = "SELECT str_id AS team_id, $link AS link, (CASE WHEN content IS NULL THEN clubs.name ELSE content END) AS content, con_id FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id JOIN teams ON teams.name = clubs.national_team_id HAVING content = ";
+    $QUERY_TEAMS = "SELECT team_id AS team_id, link, CAST(CONVERT(content USING utf8) AS BINARY) AS content, con_id FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND BINARY content = BINARY ";
+    $QUERY_CLUBS = "SELECT str_id AS team_id, $link AS link, (CASE WHEN content IS NULL THEN CAST(CONVERT(clubs.name USING utf8) AS BINARY) ELSE content END) AS content, con_id FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id JOIN teams ON teams.name = clubs.national_team_id HAVING BINARY content = BINARY ";
 
     $teams = [];
     $array = json_decode($teams_names_array);
@@ -28,8 +28,8 @@ function get_teams($teams_names_array, $mode, $icons_mode=CLUBS_MODE_FLAGS) {
 function check_team($team_name, $mode) {
     global $base;
 
-    $QUERY_TEAMS = "SELECT COUNT(*) FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = '$team_name';";
-    $QUERY_CLUBS = "SELECT COUNT(*) FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id WHERE (CASE WHEN lang_id IS NULL THEN TRUE ELSE lang_id = 1 END) AND (CASE WHEN content IS NULL THEN name ELSE content END) = '$team_name';";
+    $QUERY_TEAMS = "SELECT COUNT(*) FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND BINARY content = BINARY '$team_name';";
+    $QUERY_CLUBS = "SELECT COUNT(*) FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id WHERE (CASE WHEN lang_id IS NULL THEN TRUE ELSE lang_id = 1 END) AND (CASE WHEN content IS NULL THEN BINARY name ELSE BINARY content END) = BINARY '$team_name';";
 
     $query = mysqli_query($base, ($mode == TEAMS_MODE_NATIONAL) ? $QUERY_TEAMS : $QUERY_CLUBS);
     $amount = mysqli_fetch_row($query)[0];

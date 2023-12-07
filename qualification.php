@@ -5,8 +5,8 @@ include_once 'database.php';
 include_once 'php/functions.php';
 include_once 'php/variables.php';
 
-define("NATIONAL_TEAMS_QUERY", "SELECT team_id, link, content, con_id FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id");
-define("CLUBS_TEAMS_QUERY", "SELECT str_id AS team_id, (CASE WHEN names_clubs.content IS NULL THEN clubs.name ELSE names_clubs.content END) AS content, national_team_id, con_id FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id JOIN teams ON teams.name = clubs.national_team_id JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id");
+define("NATIONAL_TEAMS_QUERY", "SELECT team_id, link, CAST(CONVERT(content USING utf8) AS BINARY) AS content, con_id FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id");
+define("CLUBS_TEAMS_QUERY", "SELECT str_id AS team_id, (CASE WHEN names_clubs.content IS NULL THEN CAST(CONVERT(clubs.name USING utf8) AS BINARY) ELSE CAST(CONVERT(names_clubs.content USING utf8) AS BINARY) END) AS content, national_team_id, con_id FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id JOIN teams ON teams.name = clubs.national_team_id JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id");
 
 function get_national_teams($confed, $team_text) {
     get_from_db(TEAMS_MODE_NATIONAL, "WHERE confederations.name = '$confed' AND content LIKE '$team_text%' ORDER BY content;");
