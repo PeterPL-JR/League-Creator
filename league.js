@@ -190,7 +190,8 @@ function createMatchRow(table, matchObj) {
 
 /** Get HTML image element if it's defined */
 function getImageElement(src) {
-    let imageHTML = `<img src="${FLAGS_SRC}${src}">`;
+    let iconLink = (teamsMode == TEAMS_MODE_CLUBS) ? ((iconsMode == CLUBS_MODE_FLAGS) ? FLAGS_SRC : LOGOS_SRC) : FLAGS_SRC;
+    let imageHTML = `<img src="${iconLink}${src}">`;
     return (src) ? imageHTML : "";
 }
 

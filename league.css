@@ -62,7 +62,7 @@ input#league-name {
     font-size: 26px;
 }
 
-select#teams-mode-select {
+select.select {
     font-size: 25px;
     width: 350px;
     height: 40px;
@@ -237,7 +237,7 @@ img.medal {
 }
 
 .matches-table img {
-    width: 50px;
+    height: 32px;
     padding-left: 8px;
     padding-right: 8px;
 }

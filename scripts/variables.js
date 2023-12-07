@@ -10,10 +10,15 @@ const TEAMS_MODE_NATIONAL = 0;
 const TEAMS_MODE_CLUBS = 1;
 const TEAMS_MODE_CUSTOM = 2;
 
+const CLUBS_MODE_FLAGS = 0;
+const CLUBS_MODE_LOGOS = 1;
+
 // PHP / SRC
 const LEAGUE_PHP_FILE = "league.php";
 const QUALIFICATION_PHP_FILE = "qualification.php";
-const FLAGS_SRC = "../create-mundial/flags/";
+
+const FLAGS_SRC = "../league-online/flags/";
+const LOGOS_SRC = "../league-online/logos/";
 
 // Mouse Buttons 
 const LEFT_BUTTON = 0;

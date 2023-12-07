@@ -96,7 +96,7 @@ if(isset($_POST['script'])) {
             <input type="number" id='groups-amount-input' value="9">
             <br>
 
-            <select id="teams-mode-select">
+            <select id="teams-mode-select" class="select">
                 <option>Drużyny narodowe</option>
                 <option>Kluby</option>
                 <option>(Własne)</option>

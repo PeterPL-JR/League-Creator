@@ -1,5 +1,5 @@
 <?php
 
-include '../create-mundial/database.php';
+include '../league-online/database.php';
 
 ?>

@@ -5,6 +5,7 @@ let leagueName; // Tournament name
 let teamsAmount; // Teams participating in the tournament
 let roundsAmount; // Rounds (First match/rematch)
 let teamsMode; // National teams/clubs/custom teams
+let iconsMode; // Flags/logos mode for clubs
 
 let colorsMode = 0; // Mode of colors displayed on the table
 
@@ -12,7 +13,7 @@ let matchdays; // Matchdays
 let matchesPerMatchday; // Amout of matches per matchday
 
 const MIN_TEAMS = 3;
-const MAX_TEAMS = 12;
+const MAX_TEAMS = 18;
 
 let placesAfterRounds = []; // Teams places in table after each matchday
 let colors = {}; // Colors of each row of table
@@ -28,6 +29,9 @@ const COLORS_MODES = 2;
 let leftColorsArrow = getId("colors-arrow-left");
 let rightColorsArrow = getId("colors-arrow-right");
 
+let teamsModeSelect = getId("teams-mode-select");
+let iconsModeDiv = getId("icons-mode");
+
 /** Init menu settings page */
 function initMenuPage() {
     // Init colors settings divs
@@ -36,6 +40,10 @@ function initMenuPage() {
     
     // Button event that initializes the game
     saveButton.onclick = clickMenuButton;
+
+    teamsModeSelect.onchange = function() {
+        iconsModeDiv.style.display = (teamsModeSelect.selectedIndex == TEAMS_MODE_CLUBS) ? "block" : "none";
+    }
 }
 
 /** Init settings page */
@@ -118,11 +126,12 @@ function initColors() {
 function clickMenuButton() {
     let leagueNameInput = getId("league-name");
     let teamsAmountInput = getId("teams-amount");
-    let teamsModeSelect = getId("teams-mode-select");
-    
+    let iconsModeSelect = getId("icons-mode-select");
+
     let leagueNameBuffer = leagueNameInput.value;
     let teamsAmountBuffer = parseInt(teamsAmountInput.value);
     teamsMode = teamsModeSelect.selectedIndex;
+    iconsMode = (teamsMode == TEAMS_MODE_CLUBS) ? iconsModeSelect.selectedIndex : CLUBS_MODE_FLAGS;
 
     // Set default tournament name if it's empty
     if(isStringEmpty(leagueNameBuffer)) {
@@ -142,6 +151,7 @@ function clickMenuButton() {
 
         // Modify Teams-Mode Selection
         teamsModeSelect.setAttribute("readonly", "true");
+        iconsModeSelect.setAttribute("readonly", "true");
 
         initSettingsPage();
     }
@@ -165,7 +175,7 @@ function clickStartButton() {
 
     // Check teams in DB
     const teamsArrayString = JSON.stringify(teamsBuffer1);
-    serverPost(LEAGUE_PHP_FILE, { script: GET_TEAMS_SCRIPT, data: teamsArrayString, mode: teamsMode }, function (responceText) {
+    serverPost(LEAGUE_PHP_FILE, { script: GET_TEAMS_SCRIPT, data: teamsArrayString, mode: teamsMode, icons_mode: iconsMode }, function (responceText) {
         let teamsBuffer2 = checkTeams(JSON.parse(responceText), teamsBuffer1, teamsMode);
 
         // Check all data

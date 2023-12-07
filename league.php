@@ -6,11 +6,12 @@ include_once 'php/functions.php';
 include_once 'php/variables.php';
 
 /** Function that gets data of a team from DB */
-function get_teams($teams_names_array, $mode) {
+function get_teams($teams_names_array, $mode, $icons_mode=CLUBS_MODE_FLAGS) {
     global $base;
+    $link = ($mode == TEAMS_MODE_CLUBS && $icons_mode == CLUBS_MODE_LOGOS) ? "logo_src" : "link";
 
     $QUERY_TEAMS = "SELECT team_id AS team_id, link, content, con_id FROM teams JOIN names_teams ON names_teams.team_id = teams.name WHERE lang_id = 1 AND content = ";
-    $QUERY_CLUBS = "SELECT str_id AS team_id, link, (CASE WHEN content IS NULL THEN clubs.name ELSE content END) AS content, con_id FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id JOIN teams ON teams.name = clubs.national_team_id HAVING content = ";
+    $QUERY_CLUBS = "SELECT str_id AS team_id, $link AS link, (CASE WHEN content IS NULL THEN clubs.name ELSE content END) AS content, con_id FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id JOIN teams ON teams.name = clubs.national_team_id HAVING content = ";
 
     $teams = [];
     $array = json_decode($teams_names_array);
@@ -43,7 +44,7 @@ if(isset($_POST['script'])) {
 
     // Perform functions
     if($script == GET_TEAMS_SCRIPT) {
-        get_teams($_POST['data'], $_POST['mode']);
+        get_teams($_POST['data'], $_POST['mode'], $_POST['icons_mode']);
     }
     if($script == CHECK_TEAM_SCRIPT) {
         check_team($_POST['data'], $_POST['mode']);
@@ -81,12 +82,20 @@ if(isset($_POST['script'])) {
     <input type="number" id="teams-amount" value="4"><br>
 
     <div class='header'>Drużyny</div>
-    <select id="teams-mode-select">
+    <select id="teams-mode-select" class="select">
         <option>Drużyny narodowe</option>
         <option>Kluby</option>
         <option>(Własne)</option>
     </select>
     <br><br>
+    <div id="icons-mode" style="display: none;">
+        <div class="header">Ikona</div>
+        <select id="icons-mode-select" class="select">
+            <option>Flaga</option>
+            <option>Herb Klubu</option>
+        </select>
+        <br><br>
+    </div>
 
     <button id="save-amount">Zapisz</button><br>
     
