@@ -59,7 +59,8 @@ if(isset($_POST['script'])) {
     <meta charset="UTF-8">
     <title>League Creator</title>
     <script src="scripts/library.js"></script>
-    <script src="scripts/matches.js"></script>
+    <script src="scripts/football.js"></script>
+
     <script src="scripts/functions.js"></script>
     <script src="scripts/variables.js"></script>
     

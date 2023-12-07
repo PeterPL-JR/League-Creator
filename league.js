@@ -13,6 +13,9 @@ const COLORS_NAMES = [];
 COLORS_NAMES[COLORS_MODE_LEAGUE] = ["green", "yellow", "default", "red"];
 COLORS_NAMES[COLORS_MODE_PLACES] = ["gold", "silver", "brown", "default"];
 
+const TABLE_STATS = ["points", "goalsScored", "goalsLost", "goals", "wins", "draws", "losses"];
+const SORT_KEYS = ["points", "headToHead", "goals", "goalsScored", "wins", "matches"];
+
 let matchday = 0;
 let match = 0;
 
@@ -26,10 +29,7 @@ let end = false;
 
 /** Init the game */
 function init() {
-    // Init teams/matches data
-    initTeamsData();
-    initMatchesData();
-    
+    initMatches();
     initEvents();
 
     // Create initial HTML tables
@@ -57,37 +57,13 @@ function initEvents() {
     }
 }
 
-/** Init array of teams objects */
-function initTeamsData() {
-    for (let t = 0; t < teams.length; t++) {
-        // Object of team statistics
-        teams[t].stats = {
-            points: 0,
-            goalsScored: 0, goalsLost: 0,
-
-            goals: 0,
-            wins: 0, draws: 0, losses: 0,
-        };
-    }
-}
-
 /** Init array of matches/matchdays */
-function initMatchesData() {
+function initMatches() {
     let doubleMatches = (roundsAmount == 2) ? true : false; // First match/rematch?
-    let matchdaysArray = createMatches(teams.length, doubleMatches); // Array of matchdays/matches
+    matches = createMatches(teams, doubleMatches); // Array of matchdays/matches
 
-    matchdays = matchdaysArray.length;
-    matchesPerMatchday = matchdaysArray[0].length;
-
-    // Create matches array
-    for (let i = 0; i < matchdaysArray.length; i++) {
-        for (let match of matchdaysArray[i]) {
-            let team1 = teams[match[0] - 1];
-            let team2 = teams[match[1] - 1];
-
-            matches.push(new Match(team1, team2));
-        }
-    }
+    matchdays = matches.length;
+    matchesPerMatchday = matches[0].length;
 }
 
 /** Generate table of teams */
@@ -124,9 +100,6 @@ function createTeamsTable(teamsTable) {
 }
 /** Generate matches table of a matchday */
 function createMatchesTable(matchesArray, matchday=0) {
-    // First match of a matchday
-    let firstMatchIndex = matchday * matchesPerMatchday; 
-
     // HTML table element
     let table = document.createElement("table");
     table.className = MATCHES_TABLE_CLASS;
@@ -135,8 +108,8 @@ function createMatchesTable(matchesArray, matchday=0) {
     matchesDiv.appendChild(table); 
 
     // Create HTML row elements of matches
-    for (let i = firstMatchIndex; i < firstMatchIndex + matchesPerMatchday; i++) {
-        createMatchRow(table, matchesArray[i]);
+    for (let i = 0; i < matchesPerMatchday; i++) {
+        createMatchRow(table, matchesArray[matchday][i]);
     }
     // Set round name
     setRoundName(matchday + 1);
@@ -146,7 +119,7 @@ function createMatchesTable(matchesArray, matchday=0) {
 function createTeamRow(table, teamObj, rowIndex) {
     let place = rowIndex + 1;
     // Team data
-    let teamImage = getImageElement(teamObj.link);
+    let teamImage = getImageElement(teamObj.imgLink);
     // HTML row element
     let placeText = getPlaceElement(place);
 
@@ -155,8 +128,8 @@ function createTeamRow(table, teamObj, rowIndex) {
     table.appendChild(tr);
 
     // Team statistics
-    for (let key in teamObj.stats) {
-        let stat = teamObj.stats[key];
+    for (let key of TABLE_STATS) {
+        let stat = teamObj[key]();
     
         // HTML table field element
         let td = document.createElement("td");
@@ -168,24 +141,24 @@ function createTeamRow(table, teamObj, rowIndex) {
 /** Function that generates one row of a match (for matches table) */
 function createMatchRow(table, matchObj) {
     // Find teams objects of the match
-    let team1 = findTeam(teams, matchObj.team1);
-    let team2 = findTeam(teams, matchObj.team2);
+    let team1 = findTeam(teams, matchObj.team1.id);
+    let team2 = findTeam(teams, matchObj.team2.id);
 
-    let image1 = getImageElement(team1.link);
-    let image2 = getImageElement(team2.link);
+    let image1 = getImageElement(team1.imgLink);
+    let image2 = getImageElement(team2.imgLink);
 
     // HTML row element
     let tr = document.createElement("tr");
     table.appendChild(tr);
 
     tr.innerHTML =
-    `${getMatchTeamText(image1, team1.name, DIRECTION_LEFT, false)}
+    `${getMatchTeamText(image1, team1.teamName, DIRECTION_LEFT, false)}
     <td>
         <input class='score-input' type="number" id="text1" disabled value="" onfocus='hideMatches();'>
         <b>-</b>
         <input class='score-input' type="number" id="text2" disabled value="" onfocus='hideMatches();'>
     </td>
-    ${getMatchTeamText(image2, team2.name, DIRECTION_RIGHT, false)}`;
+    ${getMatchTeamText(image2, team2.teamName, DIRECTION_RIGHT, false)}`;
 }
 
 /** Get HTML image element if it's defined */
@@ -215,17 +188,17 @@ function setTableTeams(teamsTable) {
         let tds = trs[i].querySelectorAll("td");
 
         // Basic team data
-        let teamImage = getImageElement(teamsTable[i].link);
+        let teamImage = getImageElement(teamsTable[i].imgLink);
         let teamId = teamsTable[i].id;
 
-        tds[TEAM_COLLUMN_INDEX].innerHTML = getTeamText(teamsTable[i], teamImage, i); // TODO
+        tds[TEAM_COLLUMN_INDEX].innerHTML = getTeamText(teamsTable[i], teamImage, i);
 
         // Statistics of the team
         let stats = [];
-        for (let key in teamsTable[i].stats) {
-            stats.push(teamsTable[i].stats[key]);
+        for (let key of TABLE_STATS) {
+            stats.push(teamsTable[i][key]());
         }
-        stats.push(countMatchesPlayed(teamId, matches))
+        stats.push(countMatchesPlayed(teamId, concatArray(matches)));
 
         for (let j = FIRST_STATS_COLLUMN_INDEX; j < FIRST_STATS_COLLUMN_INDEX + stats.length; j++) {
             tds[j].innerHTML = stats[j - FIRST_STATS_COLLUMN_INDEX];
@@ -284,18 +257,12 @@ function startMatch() {
 }
 /** End a match and score it (currently played) */
 function playMatch(score1, score2) {
-    let matchIndex = matchday * matchesPerMatchday + match; // Index of the match
-    let matchObject = matches[matchIndex]; // Object of the match
-
-    // Teams
-    let team1 = findTeam(teams, matchObject.team1);
-    let team2 = findTeam(teams, matchObject.team2);
+    let matchObject = matches[matchday][match]; // Object of the match
 
     // Score the match
     matchObject.playMatch(score1, score2);
-    scoreMatchPoints(score1, score2, team1, team2);
     // Sort table of teams
-    let sorted = sortTeams(teams);
+    let sorted = sortTeams(teams, SORT_KEYS, matches);
     setTableTeams(sorted);
 
     match++;
@@ -373,8 +340,8 @@ function displayMatches(teamId, rowIndex) {
     
     // Choosen team data
     const thisTeam = findTeam(teams, teamId);
-    const thisTeamName = thisTeam.name;
-    const thisTeamImage = getImageElement(thisTeam.link);
+    const thisTeamName = thisTeam.teamName;
+    const thisTeamImage = getImageElement(thisTeam.imgLink);
 
     // Header
     teamMatchesDiv.innerHTML = `<div class='team-header'>${thisTeamImage} ${thisTeamName}</div>`;
@@ -383,10 +350,11 @@ function displayMatches(teamId, rowIndex) {
     let table = document.createElement("table");
     table.className = MATCHES_TABLE_CLASS;
 
-    let matchesAmount = matches.length;
+    let matchesArray = concatArray(matches);
+    let matchesAmount = matchesArray.length;
 
     for(let i = 0; i < matchesAmount; i++) {
-        let match = matches[i];
+        let match = matchesArray[i];
 
         // Create a new table if there's second round
         if(roundsAmount == 2 && i == matchesAmount / 2) {
@@ -397,14 +365,14 @@ function displayMatches(teamId, rowIndex) {
             table.className = MATCHES_TABLE_CLASS;
         }
 
-        if(match.team1 != teamId && match.team2 != teamId) continue;
+        if(match.team1.id != teamId && match.team2.id != teamId) continue;
         // Teams objects
-        let team1 = findTeam(teams, match.team1);
-        let team2 = findTeam(teams, match.team2);
+        let team1 = findTeam(teams, match.team1.id);
+        let team2 = findTeam(teams, match.team2.id);
         
         // Flags
-        let image1 = (team1.id == teamId) ? getImageElement(team1.link) : "";
-        let image2 = (team2.id == teamId) ? getImageElement(team2.link) : "";
+        let image1 = (team1.id == teamId) ? getImageElement(team1.imgLink) : "";
+        let image2 = (team2.id == teamId) ? getImageElement(team2.imgLink) : "";
         
         // Match scores
         let score1 = (match.score1 != -1) ? match.score1 : "";
@@ -414,13 +382,13 @@ function displayMatches(teamId, rowIndex) {
         table.appendChild(tr);
 
         tr.innerHTML = 
-        `${getMatchTeamText(image1, team1.name, DIRECTION_LEFT, team1.id == teamId)}
+        `${getMatchTeamText(image1, team1.teamName, DIRECTION_LEFT, team1.id == teamId)}
         <td>
             <input class='score-input' type="number" disabled value='${score1}'>
             <b>-</b>
             <input class='score-input' type="number" disabled value='${score2}'>
         </td>
-        ${getMatchTeamText(image2, team2.name, DIRECTION_RIGHT, team2.id == teamId)}`;
+        ${getMatchTeamText(image2, team2.teamName, DIRECTION_RIGHT, team2.id == teamId)}`;
     }
     teamMatchesDiv.appendChild(table);
 }
@@ -452,7 +420,7 @@ function roundsTable() {
     for (let t = 0; t < teams.length; t++) {
         // HTML row element of a team and places of it
         let tr = document.createElement("tr");
-        tr.innerHTML = `<td>${getImageElement(finalTeams[t].link)}<div>${finalTeams[t].name}</div></td>`;
+        tr.innerHTML = `<td>${getImageElement(finalTeams[t].imgLink)}<div>${finalTeams[t].teamName}</div></td>`;
         table.appendChild(tr);
         
         // Generate collumns of each round of the team
@@ -504,8 +472,7 @@ function displayMatchday(index) {
 
     // Set match scores if it's played
     for(let i = 0; i < matchesPerMatchday; i++) {
-        let matchIndex = index * matchesPerMatchday + i;
-        let match = matches[matchIndex];
+        let match = matches[index][i];
         
         if(match.score1 != -1 && match.score2 != -1) {
             let matchElem = getMatchElem(i);
@@ -581,7 +548,7 @@ function setArrowSpanVisible(rowIndex, visible) {
 
 /** Function that gets text of table row of team information (teams table/matches table) */
 function getTeamText(teamObj, teamImage, rowIndex) {
-    return `${teamImage}<div class='team-name' onmousedown='displayMatches("${teamObj.id}", ${rowIndex});'>${teamObj.name}<span>V</span></div>`;
+    return `${teamImage}<div class='team-name' onmousedown='displayMatches("${teamObj.id}", ${rowIndex});'>${teamObj.teamName}<span>V</span></div>`;
 }
 function getMatchTeamText(teamImage, teamName, direction, bold) {
     let imageText = teamImage;

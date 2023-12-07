@@ -176,7 +176,12 @@ function clickStartButton() {
     // Check teams in DB
     const teamsArrayString = JSON.stringify(teamsBuffer1);
     serverPost(LEAGUE_PHP_FILE, { script: GET_TEAMS_SCRIPT, data: teamsArrayString, mode: teamsMode, icons_mode: iconsMode }, function (responceText) {
-        let teamsBuffer2 = checkTeams(JSON.parse(responceText), teamsBuffer1, teamsMode);
+        let serverTeams = [];
+        for(let team of JSON.parse(responceText)) {
+            serverTeams.push(new Team(team.id, team.name, team.link));
+        }
+        
+        let teamsBuffer2 = checkTeams(serverTeams, teamsBuffer1, teamsMode);
 
         // Check all data
         if(teamsBuffer2) {
@@ -198,11 +203,10 @@ function checkTeams(serverTeams, teamsNamesArray, teamsMode) {
         // Create custom team object
         if(teamObj == null || teamsMode == TEAMS_MODE_CUSTOM) {
             let id = getRandomID(teamsBuffer);
-            let name = teamName;
-            teamObj = {name, id};
+            teamObj = new Team(id, teamName);
         }
         // Approve a team
-        if(!isStringEmpty(teamObj.name)) {
+        if(!isStringEmpty(teamObj.teamName)) {
             teamsBuffer.push(teamObj);
         }
     }

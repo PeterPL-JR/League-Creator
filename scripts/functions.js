@@ -8,7 +8,7 @@ function findTeamByName(teamsArray, name, capitalLetters=true) {
     for (let team of teamsArray) {
 
         // Capital/small letters
-        let constName = team["name"];
+        let constName = team["teamName"];
         let checkedName = name;
 
         if(!capitalLetters) {
@@ -39,7 +39,7 @@ function countMatchesPlayed(teamId, matchesArray) {
     let matchesPlayed = 0;
 
     for(let match of matchesArray) {
-        if((match.team1 == teamId || match.team2 == teamId) && match.score1 != -1 && match.score2 != -1) {
+        if((match.team1.id == teamId || match.team2.id == teamId) && match.score1 != -1 && match.score2 != -1) {
             matchesPlayed++;
         }
     }

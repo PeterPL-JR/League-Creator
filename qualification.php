@@ -81,7 +81,6 @@ if(isset($_POST['script'])) {
     <link id='theme' rel="stylesheet" href="styles/themes/theme-light.css" type='text/css'>
 
     <script src="scripts/library.js"></script>
-    <script src="scripts/matches.js"></script>
     <script src="scripts/functions.js"></script>
     <script src="scripts/variables.js"></script>
 </head>
