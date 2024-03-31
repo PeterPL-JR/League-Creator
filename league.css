@@ -9,12 +9,21 @@ body {
 }
 
 h1#logo {
-    background-color: var(--back-color-2);
+    background-color: var(--logo-color);
     font: bold 50px 'Verdana';
     border: solid var(--border-color) 7px;
     padding: 5px;
     
     width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+}
+h2#sub-logo {
+    background-color: var(--sub-logo-color);
+    font: bold 30px 'Verdana';
+    padding: 3px;
+
+    width: 200px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -29,6 +38,7 @@ button, input, select {
 input {
     text-align: center;
     border-radius: 3px;
+    appearance: textfield;
 }
 
 /* INIT DIV */
@@ -261,8 +271,6 @@ input::-webkit-inner-spin-button, input::-webkit-outer-spin-button {
 }
 
 input.score-input {
-    appearance: textfield;
-    
     width: 20px;
     padding: 3px;
     font: normal 23px 'Verdana';

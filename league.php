@@ -19,7 +19,7 @@ function get_teams($teams_names_array, $mode, $icons_mode=CLUBS_MODE_FLAGS) {
     foreach($array as $team_name) {
         $query = mysqli_query($base, (($mode == TEAMS_MODE_NATIONAL) ? $QUERY_TEAMS : $QUERY_CLUBS)."'$team_name';");
         while ($row = mysqli_fetch_assoc($query)) {
-            array_push($teams, get_team($row));
+            array_push($teams, get_team_obj($row));
         }
     }
     echo json_encode($teams)."";
@@ -40,7 +40,7 @@ function check_team($team_name, $mode) {
 // Perform a function if script is defined or else display HTML page
 if(isset($_POST['script'])) {
     // Script type
-    $script = $_POST['script']; 
+    $script = $_POST['script'];
 
     // Perform functions
     if($script == GET_TEAMS_SCRIPT) {

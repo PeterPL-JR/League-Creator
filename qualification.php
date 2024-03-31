@@ -5,54 +5,82 @@ include_once 'database.php';
 include_once 'php/functions.php';
 include_once 'php/variables.php';
 
-define("NATIONAL_TEAMS_QUERY", "SELECT team_id, link, CAST(CONVERT(content USING utf8) AS BINARY) AS content, con_id FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id");
-define("CLUBS_TEAMS_QUERY", "SELECT str_id AS team_id, (CASE WHEN names_clubs.content IS NULL THEN CAST(CONVERT(clubs.name USING utf8) AS BINARY) ELSE CAST(CONVERT(names_clubs.content USING utf8) AS BINARY) END) AS content, national_team_id, con_id FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id JOIN teams ON teams.name = clubs.national_team_id JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id");
+define("TEAM_NAME_QUERY", "(CASE WHEN names_clubs.content IS NULL THEN clubs.name ELSE names_clubs.content END)");
 
-function get_national_teams($confed, $team_text) {
-    get_from_db(TEAMS_MODE_NATIONAL, "WHERE confederations.name = '$confed' AND content LIKE '$team_text%' ORDER BY content;");
+define("NATIONAL_TEAMS_ELEMENTS", columns(["team_id" => "id", "link", "content" => "name", "con_id"]));
+define("CLUBS_TEAMS_ELEMENTS", columns(["str_id" => "id", TEAM_NAME_QUERY => "name", "national_team_id", "con_id"]));
+
+function NATIONAL_TEAMS_QUERY($select_columns, $clauses="") {
+    return "SELECT $select_columns FROM teams JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id WHERE lang_id = 1 $clauses;";
 }
-function get_clubs_teams($confed, $team_text, $national_team_text) {
-    get_from_db(TEAMS_MODE_CLUBS, "WHERE confederations.name = '$confed' AND names_teams.content LIKE '$national_team_text%' HAVING content LIKE '$team_text%' ORDER BY names_teams.content, content;");
+function CLUBS_TEAMS_QUERY($select_columns, $clauses="") {
+    return "SELECT $select_columns FROM clubs LEFT JOIN names_clubs ON names_clubs.club_id = clubs.str_id JOIN teams ON teams.name = clubs.national_team_id JOIN names_teams ON names_teams.team_id = teams.name JOIN confederations ON teams.con_id = confederations.id WHERE names_teams.lang_id = 1 $clauses;";
 }
-function get_all_teams($teams_mode) {
-    get_from_db($teams_mode);
+
+function QUERY_ALL_NATIONAL_TEAMS() {
+    return NATIONAL_TEAMS_QUERY(NATIONAL_TEAMS_ELEMENTS);
+}
+function QUERY_ALL_CLUBS_TEAMS() {
+    return CLUBS_TEAMS_QUERY(CLUBS_TEAMS_ELEMENTS);
+}
+
+function QUERY_NATIONAL_TEAM_ID($con_id, $team_text) {
+    return NATIONAL_TEAMS_QUERY(columns(["team_id" => "id"]), "AND confederations.id = $con_id AND ".OPERATOR_LIKE("content", $team_text)." ORDER BY content");
+}
+function QUERY_CLUBS_TEAM_ID($con_id, $team_text, $national_team_text) {
+    return CLUBS_TEAMS_QUERY(columns(["str_id" => "id", TEAM_NAME_QUERY => "name"]), "AND confederations.id = $con_id AND ".OPERATOR_LIKE("names_teams.content", $national_team_text)." HAVING ".OPERATOR_LIKE("name", $team_text)." ORDER BY names_teams.content, level DESC, name");
+}
+
+function OPERATOR_LIKE($column_name, $name) {
+    return "($column_name LIKE '$name%' || $column_name LIKE '% $name%')";
 }
 
 function get_confeds() {
     global $base;
 
-    $get_confeds = mysqli_query($base, "SELECT name FROM confederations;");
+    $get_confeds = mysqli_query($base, "SELECT id, name FROM confederations;");
     while($row = mysqli_fetch_row($get_confeds)) {
-        echo "<option>".$row[0]."</option>";
+        echo "<option value='$row[0]'>$row[1]</option>";
     }
 }
 
-function get_from_db($teams_mode, $where_clauses="") {
-    global $base;
-    if($teams_mode == TEAMS_MODE_NATIONAL) {
-        $query_text = NATIONAL_TEAMS_QUERY;
-    }
-    if($teams_mode == TEAMS_MODE_CLUBS) {
-        $query_text = CLUBS_TEAMS_QUERY;
-    }
-
+function get_teams($query) {
+    $db_data = get_from_db($query);
     $teams = [];
-    $query = mysqli_query($base, $query_text." ".$where_clauses);
-
-    while($row = mysqli_fetch_assoc($query)) {
-        if($teams_mode == TEAMS_MODE_NATIONAL) {
-            array_push($teams, get_national_team($row));
-        }
-        if($teams_mode == TEAMS_MODE_CLUBS) {
-            array_push($teams, get_clubs_team($row));
-        }
+    foreach($db_data as $team) {
+        array_push($teams, $team["id"]);
     }
-    echo json_encode($teams);
+    send_data($teams);
+}
+
+function get_all_teams($query) {
+    send_data(get_from_db($query));
+}
+
+function get_national_teams($con_id, $team_text) {
+    get_teams(QUERY_NATIONAL_TEAM_ID($con_id, $team_text));
+}
+function get_clubs_teams($con_id, $team_text, $national_team_text) {
+    $n_teams = get_from_db(NATIONAL_TEAMS_QUERY(columns(["teams.name" => "id"]), " AND con_id = $con_id AND ".OPERATOR_LIKE("names_teams.content", $national_team_text)." ORDER BY names_teams.content"));
+    if(count($n_teams) == 1 || !empty($team_text)) {
+        get_teams(QUERY_CLUBS_TEAM_ID($con_id, $team_text, $national_team_text));
+    }
+    else {
+        $teams = [];
+        foreach($n_teams as $team) {
+            $id = $team["id"];
+            $clubs_teams = get_from_db(CLUBS_TEAMS_QUERY(CLUBS_TEAMS_ELEMENTS, " AND national_team_id = '$id' AND level = 5 ORDER BY ".TEAM_NAME_QUERY));
+            foreach($clubs_teams as $club) {
+                array_push($teams, $club["id"]);
+            }
+        }
+        send_data($teams);
+    }
 }
 
 if(isset($_POST['script'])) {
     // Script type
-    $script = $_POST['script']; 
+    $script = $_POST['script'];
 
     // Perform functions
     if($script == GET_NATIONAL_TEAMS) {
@@ -63,10 +91,10 @@ if(isset($_POST['script'])) {
     }
     
     if($script == GET_ALL_NATIONAL_TEAMS) {
-        get_all_teams(TEAMS_MODE_NATIONAL);
+        get_all_teams(QUERY_ALL_NATIONAL_TEAMS());
     }
     if($script == GET_ALL_CLUBS_TEAMS) {
-        get_all_teams(TEAMS_MODE_CLUBS);
+        get_all_teams(QUERY_ALL_CLUBS_TEAMS());
     }
 } else {
 ?>
@@ -81,10 +109,12 @@ if(isset($_POST['script'])) {
     <link id='theme' rel="stylesheet" href="styles/themes/theme-light.css" type='text/css'>
 
     <script src="scripts/library.js"></script>
+    <script src="scripts/football.js"></script>
+
     <script src="scripts/functions.js"></script>
     <script src="scripts/variables.js"></script>
 </head>
-<body onload="initTheme();">
+<body onload="get(); initTheme();">
 <img src="images/user.png" id='settings'>
     <div id="pots-container">
         <div id="pots-inputs-div">
