@@ -2,11 +2,12 @@ let nationalTeams = [];
 let clubsTeams = [];
 let customTeams = [];
 
-let allPots = [];
 let allTeams = [];
 
 let potsTeams = [];
 let potsLengths = [];
+
+let potsTables = [];
 
 const container = getId("container");
 const potsContainer = getId("pots-container");
@@ -28,21 +29,13 @@ const teamsModeSelect = getId("teams-mode-select");
 const buttonSave = getId("button-save");
 const buttonDrawStart = getId("button-draw-start");
 
-let _teams;
+let teamsList = new TeamsList(teamsDiv);
 
+let _teams;
 let _groups;
 let _pots;
 
-let draggedTeam = null;
-let dragBegin = null;
-let flyingElem = null;
-let scrollBegin = null;
-let started = false;
-
-let mouseX = null;
-let mouseY = null;
-
-const imagesObjs = {};
+let imagesObjs = {};
 
 function initMenu() {
     buttonSave.onclick = save;
@@ -60,6 +53,11 @@ function initMenu() {
     teamsModeSelect.onchange = changeTeamsModeSelect;
     confedSelect.onchange = createTeamsElements;
     
+    teamsList.onStopMoving = function() {
+        for(let i = 0; i < _pots; i++) {
+            mouseOutPot(i);
+        }
+    }
     buttonAdd.onclick = addTeam;
 
     potsDiv.oncontextmenu = function() {
@@ -74,13 +72,7 @@ function get() {
     // National teams
     serverPost(QUALIFICATION_PHP_FILE, {script: GET_ALL_NATIONAL_TEAMS}, function(responceText) {
         nationalTeams = parseNationalTeams(responceText);
-
-        for(let team of nationalTeams) {
-            const img = document.createElement("img");
-            img.src = FLAGS_SRC + team.imgLink;
-            img.setAttribute("draggable", "false");
-            imagesObjs[team.id] = img;
-        }
+        imagesObjs = initImgsObject(nationalTeams);
 
         // Clubs teams
         serverPost(QUALIFICATION_PHP_FILE, {script: GET_ALL_CLUBS_TEAMS}, function(responceText) {
@@ -91,7 +83,7 @@ function get() {
 }
 
 function init() {
-    started = true;
+    teamsList.start();
 
     groupsDiv.style.display = "none";
     teamsModeSelect.style.display = "none";
@@ -102,19 +94,6 @@ function init() {
     
     potsDiv.style.display = "block";
     container.style.display = "block";
-
-    document.body.onmousedown = function(event) {
-        if(event.button == RIGHT_BUTTON) {
-            stopMoving();
-        }
-    }
-    document.body.onmousemove = function(event) {
-        updateMouse(event);
-        teamMove();
-    };
-    document.body.onscroll = function() {
-        teamMove();
-    }
 
     buttonDrawStart.onclick = function() {
         potsContainer.style.setProperty("display", "none");
@@ -145,33 +124,6 @@ function save() {
     countryInput.value="";
 
     init();
-}
-
-function parseNationalTeams(text) {
-    let teamsArray = [];
-    for(let t of JSON.parse(text)) {
-        let team = new Team(t.id, t.name, t.link);
-        team.con_id = parseInt(t.con_id);
-        teamsArray.push(team);
-    }
-    return teamsArray;
-}
-function parseClubsTeams(text) {
-    let teamsArray = [];
-    for(let t of JSON.parse(text)) {
-        let team = new Team(t.id, t.name, findTeam(nationalTeams, t.national_team_id).imgLink);
-        team.con_id = parseInt(t.con_id);
-        team.national_team_id = t.national_team_id;
-        teamsArray.push(team);
-    }
-    return teamsArray;
-}
-function getTeamsFromIDs(array) {
-    let teamsArray = [];
-    for(let id of array) {
-        teamsArray.push(findTeam(allTeams, id));
-    }
-    return teamsArray;
 }
 
 function changeMainInputs() {
@@ -294,7 +246,7 @@ function createCustomTeamsDivs(teamText) {
 
 function getMatchingTeams(script, data) {
     serverPost(QUALIFICATION_PHP_FILE, {script, ...data}, function(responceText) {
-        createTeamsDivs(getTeamsFromIDs(JSON.parse(responceText)));
+        createTeamsDivs(getTeamsFromIDs(JSON.parse(responceText), allTeams));
     });
 }
 
@@ -317,7 +269,7 @@ function createGroupsTables() {
 function createPotsTables() {
     potsDiv.innerHTML = "";
 
-    allPots = [];
+    potsTables = [];
 
     potsTeams = [];
     potsLengths = [];
@@ -332,7 +284,7 @@ function createPotsTables() {
         table.setAttribute("onmouseenter", `mouseInPot(${i})`);
         table.setAttribute("onmouseleave", `mouseOutPot(${i})`);
         
-        allPots.push(table);
+        potsTables.push(table);
         potsDiv.appendChild(table);
     }
     createClearBoth(potsDiv);
@@ -354,44 +306,20 @@ function createTeamsElements() {
         createCustomTeamsDivs(inputText);
     }
 }
+
 function createTeamsDivs(teamsArray) {
-    const MAX_IN_ROW = 3;
-
-    teamsDiv.innerHTML="";
-
     const usedTeams = concatArray(potsTeams);
-    let teamsCounter = 0;
-
+    
+    let teams = [];
     for(let team of teamsArray) {
         const index = usedTeams.findIndex(function(elem) {
             return elem == team.id;
         });
         if(index == -1) {
-            createTeamDiv(team);
-            teamsCounter++;
-        }
-        if(teamsCounter % MAX_IN_ROW == 0) {
-            createClearBoth(teamsDiv);
+            teams.push(team);
         }
     }
-}
-
-function createTeamDiv(team) {
-    const div = document.createElement("div");
-    const id = team.id;
-
-    div.id = `team-div-${id}`;
-    div.innerHTML = `<div>${team.teamName}</div>`;
-    div.className = "team-elem";
-    div.setAttribute("title", team.teamName);
-
-    if(isFlagsMode()) {
-        div.prepend(getFlag(team));
-        div.classList.add("pre-team-elem");
-    }
-
-    div.setAttribute("onmousedown", `updateTeam('${id}')`);
-    teamsDiv.appendChild(div);
+    teamsList.createDivs(teams, imagesObjs);
 }
 
 function addTeam() {
@@ -399,113 +327,44 @@ function addTeam() {
     if(isStringEmpty(inputText)) return;
 
     if(findTeamByName(customTeams, inputText, false) == null) {
-        customTeams.push(new Team(getRandomID(customTeams), inputText));
+        let team = new Team(getRandomID(customTeams), inputText);
+        team.type = TEAMS_MODE_CUSTOM;
+        customTeams.push(team);
+
         teamsInput.value = "";
         createTeamsElements();
     }
 }
 
-function updateMouse(event) {
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-}
-
-function updateTeam(id) {
-    if(started) {
-        if(draggedTeam == null) startMoving(id);
-        else stopMoving();
-    }
-}
-
-function startMoving(id) {
-    document.body.style.cursor = "pointer";
-    draggedTeam = id;
-    
-    const elem = getTeam(id);
-    elem.classList.add("team-selected");
-    elem.style.visibility = "hidden";
-    
-    flyingElem = elem.cloneNode(elem);
-    flyingElem.classList.add("flying-elem");
-    flyingElem.mouseItem = null;
-    document.body.appendChild(flyingElem);
-    
-    const beginX = mouseX - elem.offsetLeft;
-    const beginY = mouseY - elem.offsetTop;
-    
-    const scrollX = window.scrollX;
-    const scrollY = window.scrollY;
-    
-    dragBegin = {x:beginX, y:beginY};
-    scrollBegin = {x:scrollX, y:scrollY};
-    
-    document.body.oncontextmenu = function() {
-        return false;
-    }
-    teamMove();
-}
-function stopMoving() {
-    document.body.style.cursor = "default";
-    const elem = getTeam(draggedTeam);
-    if(elem != null) {
-        elem.classList.remove("team-selected");
-        elem.style.visibility = "visible";
-        flyingElem.remove();
-    }
-    draggedTeam = null;
-    dragBegin = null;
-    scrollBegin = null
-    flyingElem = null;
-
-    for(let i = 0; i < _pots; i++) {
-        mouseOutPot(i);
-    }
-}
-
-function teamMove() {
-    if(draggedTeam != null) {
-        const x = mouseX - dragBegin.x - scrollBegin.x + window.scrollX;
-        const y = mouseY - dragBegin.y - scrollBegin.y + window.scrollY;
-
-        flyingElem.style.left = x + "px";
-        flyingElem.style.top = y + "px";
-    }
-}
-function getTeam(id) {
-    return getId(`team-div-${id}`);
-}
-function findTeamObj(id) {
+function findTeamInArray(id) {
     return findTeam(allTeams, id);
 }
 
 function mouseInPot(potIndex) {
-    if(draggedTeam != null) {
-        allPots[potIndex].querySelector("tr:first-child").className = "pot-selected";
+    if(teamsList.getSelectedTeam() != null) {
+        potsTables[potIndex].querySelector("tr:first-child").className = "pot-selected";
     }
 }
 function mouseOutPot(potIndex) {
-    allPots[potIndex].querySelector("tr:first-child").className="";
+    potsTables[potIndex].querySelector("tr:first-child").className="";
 }
 
 function isFlagsMode() {
     return teamsMode != TEAMS_MODE_CUSTOM;
 }
 function getFlag(teamObject) {
-    let nTeamId = (teamsMode == TEAMS_MODE_NATIONAL) ? "id" : "national_team_id";
-    let img = imagesObjs[teamObject[nTeamId]];
-    return img.cloneNode(true);
+    return getImg(teamObject, imagesObjs);
 }
 
 function choosePot(index) {
-    if(draggedTeam != null && window.event.button == LEFT_BUTTON) {   
-        const pot = potsTeams[index]; 
+    if(teamsList.getSelectedTeam() != null && window.event.button == TeamsList.CLICK_BUTTON) {
+        const pot = potsTeams[index];
         if(pot.length < potsLengths[index]) {
-
-            potsTeams[index].push(draggedTeam);
+            potsTeams[index].push(teamsList.getSelectedTeam());
             updatePot(index);
 
             createTeamsElements();
-            stopMoving();
+            teamsList.stopMoving();
         }
         checkDrawAvailable();
     }
@@ -513,30 +372,30 @@ function choosePot(index) {
 
 function updatePot(index) {
     const pot = potsTeams[index];
-    const rows = allPots[index].querySelectorAll("tr:not(:first-child)");
+    const rows = potsTables[index].querySelectorAll("tr:not(:first-child)");
 
     for(let i = 0; i < rows.length; i++) {
         rows[i].innerHTML="";
     }
 
     for(let i = 0; i < pot.length; i++) {
-        const team = findTeamObj(pot[i]);
+        const team = findTeamInArray(pot[i]);
         const row = rows[i];
         
-        setTableTeam(allPots[index], i, team);
+        setTableTeam(potsTables[index], i, team);
         row.setAttribute("onmousedown", `removePotTeam(${index}, ${i})`);
     }
 }
 function removePotTeam(potIndex, teamIndex) {
-    if(draggedTeam == null) {
+    if(teamsList.getSelectedTeam() == null) {
         const pot = potsTeams[potIndex];
         const index = pot.findIndex(function(elem) {
             return elem == pot[teamIndex];
         });
         pot.splice(index, 1);
         updatePot(potIndex);
+        
         createTeamsElements();
-
         checkDrawAvailable();
     }
 }
@@ -577,7 +436,7 @@ function draw() {
 
         const table = createTable("Grupa " + toLetter(g), group.length);
         for(let t = 0; t < group.length; t++) {
-            setTableTeam(table, t, findTeamObj(group[t]));
+            setTableTeam(table, t, findTeamInArray(group[t]));
         }
         groupsContainer.appendChild(table);
     }

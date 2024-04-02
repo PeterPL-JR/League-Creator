@@ -113,6 +113,7 @@ if(isset($_POST['script'])) {
 
     <script src="scripts/functions.js"></script>
     <script src="scripts/variables.js"></script>
+    <script src="scripts/teams.js"></script>
 </head>
 <body onload="get(); initTheme();">
 <img src="images/user.png" id='settings'>
